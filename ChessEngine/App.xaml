@@ -1,0 +1,10 @@
+﻿<Application x:Class="ChessEngine.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ChessEngine="clr-namespace:ChessEngine.ViewModel"
+             xmlns:local="clr-namespace:ChessEngine"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ChessEngine:BoardViewModel x:Key="boardViewModel"/>
+    </Application.Resources>
+</Application>
