@@ -33,7 +33,6 @@ Change them acordingly in Piece.cs and board.xaml.cs
 Project is: _in progress_ 
 
 ## Acknowledgements
-Give credit here.
 - This project was inspired by [this video](https://www.youtube.com/watch?v=U4ogK0MIzqk)
 - Many thanks to everyone who have helped me with this project so far.
 
