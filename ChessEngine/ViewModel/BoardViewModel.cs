@@ -12,6 +12,7 @@ namespace ChessEngine.ViewModel
 {
     public class BoardViewModel
     {
+        private bool isWhitesTurn = true;
         private bool movePieceEnabled = false;
         private Piece movePiece = new Piece("Pawn", true);
         private ObservableCollection<Cell> theGrid = new ObservableCollection<Cell>();
@@ -20,6 +21,7 @@ namespace ChessEngine.ViewModel
         public Piece MovePiece { get => movePiece; set => movePiece = value; }
         public bool MovePieceEnabled { get => movePieceEnabled; set => movePieceEnabled = value; }
         public ObservableCollection<Cell> TheGrid { get => theGrid; set => theGrid = value; }
+        public bool IsWhitesTurn { get => isWhitesTurn; set => isWhitesTurn = value; }
 
         public BoardViewModel()
         {
