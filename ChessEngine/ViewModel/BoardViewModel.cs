@@ -14,14 +14,24 @@ namespace ChessEngine.ViewModel
     {
         private bool isWhitesTurn = true;
         private bool movePieceEnabled = false;
+        private List<Move> moves;
         private Piece movePiece = new Piece("Pawn", true);
         private ObservableCollection<Cell> theGrid = new ObservableCollection<Cell>();
+        private MoveLogic moveLogic = new();
+
+
+
+
+
+
+
 
 
         public Piece MovePiece { get => movePiece; set => movePiece = value; }
         public bool MovePieceEnabled { get => movePieceEnabled; set => movePieceEnabled = value; }
         public ObservableCollection<Cell> TheGrid { get => theGrid; set => theGrid = value; }
         public bool IsWhitesTurn { get => isWhitesTurn; set => isWhitesTurn = value; }
+        public List<Move> Moves { get => moves; set => moves = value; }
 
         public BoardViewModel()
         {
@@ -31,7 +41,7 @@ namespace ChessEngine.ViewModel
                 theGrid.Add(new Cell(coordinates[0], coordinates[1]));
             }
             LoadDefaultPosition();
-
+            moveLogic.PrecomputedMoveData();
         }
 
         private void LoadDefaultPosition()
@@ -90,24 +100,10 @@ namespace ChessEngine.ViewModel
             return result;
         }
 
-        public void MarkNextLegalMove(Cell currentCell, string chessPiece)
-        {          
-            //Find all legal moves and mark the cells as legal
-            switch (chessPiece)
-            {
-                case "Knight":                    
-                    break;
-                case "King":
-                    break;
-                case "Rook":
-                    break;
-                case "Bishop":
-                    break;
-                case "Queen":
-                    break;
-                default:
-                    break;
-            }
+        public bool isMoveLegal(Piece piece)
+        {
+            moveLogic.GenerateMoves();
+            throw new NotImplementedException();
         }
     }
 }

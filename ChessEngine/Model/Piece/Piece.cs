@@ -12,7 +12,8 @@ namespace ChessEngine.Model.Piece
         private string name;
         private int value;
         private bool isWhite;
-        private string icon = "C:/Users/chri45n5/source/repos/ChessEngine/ChessEngine/assets/pieces/";
+        private bool hasMoved = false;
+        private string icon = "C:/Users/chris/Source/Repos/ChessEngine/ChessEngine/assets/pieces/";
         public Piece(string name, bool isWhite)
         {
             this.name = name;
@@ -24,6 +25,7 @@ namespace ChessEngine.Model.Piece
         public int Value { get => value; set => this.value = value; }
         public bool IsWhite { get => isWhite; set => isWhite = value; }
         public string Icon { get => icon; set => icon = value; }
+        public bool HasMoved { get => hasMoved; set => hasMoved = value; }
 
         private void IconFinder()
         {

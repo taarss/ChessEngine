@@ -8,7 +8,13 @@ namespace ChessEngine.Model
 {
     public class Move
     {
-        public readonly int StartSquare;
-        public readonly int TargetSquare;
+        public int StartSquare;
+        public int TargetSquare;
+
+        public Move(int startSquare, int targetSquare)
+        {
+            StartSquare = startSquare;
+            TargetSquare = targetSquare;
+        }
     }
 }

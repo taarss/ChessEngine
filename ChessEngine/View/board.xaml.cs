@@ -26,6 +26,9 @@ namespace ChessEngine.View
         private Piece selectedPiece;
         private int oldIndex;
         private BoardViewModel boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
+        private List<Move> moves;
+
+
         public Board()
         {
             InitializeComponent();
@@ -38,7 +41,6 @@ namespace ChessEngine.View
             myGrid.Height = 480;
             myGrid.HorizontalAlignment = HorizontalAlignment.Left;
             myGrid.VerticalAlignment = VerticalAlignment.Top;
-            myGrid.ShowGridLines = true;
             //Creates rows and collumns based of the given number
             for (int i = 0; i < 8; i++)
             {
@@ -47,8 +49,9 @@ namespace ChessEngine.View
                 for (int j = 0; j < 8; j++)
                 {
                     Rectangle rectangle = new Rectangle();
+                    rectangle.Name = "name" +(i * j).ToString();
                     if (isWhite)                 
-                        rectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.White);
+                        rectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.Bisque);
                     else
                         rectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.Brown);
 
@@ -67,9 +70,19 @@ namespace ChessEngine.View
 
         private void selectPiece(object sender, MouseEventArgs e)
         {
+            moves = new List<Move>();
             Point position = Mouse.GetPosition(myCanvas);
             oldIndex = CalculateIndexFromPosition(position);
-            selectedPiece = boardViewModel.TheGrid[oldIndex].piece;         
+            selectedPiece = boardViewModel.TheGrid[oldIndex].piece;
+            MoveLogic moveLogic = new();
+            moveLogic.PrecomputedMoveData();
+            moves = moveLogic.GenerateMoveForPiece(boardViewModel.TheGrid[oldIndex].piece, oldIndex);
+            foreach (var item in moves)
+            {
+                myGrid.Children.
+                Rectangle rectangle = (Rectangle)FindName("name"+item.TargetSquare.ToString());
+                rectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.Yellow);
+            }
         }
 
         private void placePiece(object sender, MouseButtonEventArgs e)
@@ -78,11 +91,20 @@ namespace ChessEngine.View
             {
                 Point position = Mouse.GetPosition(myCanvas);
                 int index = CalculateIndexFromPosition(position);
-                boardViewModel.TheGrid[index].piece = selectedPiece;
-                boardViewModel.TheGrid[oldIndex].piece = null;
-                selectedPiece = null;
-                System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chri45n5/source/repos/ChessEngine/ChessEngine/assets/sounds/chess.wav");
-                player.Play();
+                foreach (var item in moves)
+                {
+                    if (item.TargetSquare == index)
+                    {
+                        selectedPiece.HasMoved = true;
+                        boardViewModel.TheGrid[index].piece = selectedPiece;
+                        boardViewModel.TheGrid[oldIndex].piece = null;
+                        selectedPiece = null;
+                        System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chris/Source/Repos/ChessEngine/ChessEngine/assets/sounds/chess.wav");
+                        player.Play();
+                        break;
+                    }
+                }
+                
             }                              
         }
 
