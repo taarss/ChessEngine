@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ChessEngine.Model;
+using ChessEngine.Model.Piece;
+using ChessEngine.ViewModel;
 
 namespace ChessEngine.View
 {
@@ -21,18 +23,19 @@ namespace ChessEngine.View
     /// </summary>
     public partial class Board : UserControl
     {
+        private Piece selectedPiece;
+        private int oldIndex;
+        private BoardViewModel boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
         public Board()
         {
             InitializeComponent();
             InitiateGrid();
         }
         private void InitiateGrid()
-        {
-            
-
+        {           
             bool isWhite = false;
-            myGrid.Width = 500;
-            myGrid.Height = 500;
+            myGrid.Width = 480;
+            myGrid.Height = 480;
             myGrid.HorizontalAlignment = HorizontalAlignment.Left;
             myGrid.VerticalAlignment = VerticalAlignment.Top;
             myGrid.ShowGridLines = true;
@@ -47,7 +50,7 @@ namespace ChessEngine.View
                     if (isWhite)                 
                         rectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.White);
                     else
-                        rectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.Black);
+                        rectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.Brown);
 
                     isWhite = !isWhite;
                     Grid.SetRow(rectangle, j);
@@ -60,6 +63,35 @@ namespace ChessEngine.View
                 myGrid.ColumnDefinitions.Add(colDef);
 
             }
+        }
+
+        private void selectPiece(object sender, MouseEventArgs e)
+        {
+            Point position = Mouse.GetPosition(myCanvas);
+            oldIndex = CalculateIndexFromPosition(position);
+            selectedPiece = boardViewModel.TheGrid[oldIndex].piece;         
+        }
+
+        private void placePiece(object sender, MouseButtonEventArgs e)
+        {
+            if (selectedPiece != null)
+            {
+                Point position = Mouse.GetPosition(myCanvas);
+                int index = CalculateIndexFromPosition(position);
+                boardViewModel.TheGrid[index].piece = selectedPiece;
+                boardViewModel.TheGrid[oldIndex].piece = null;
+                selectedPiece = null;
+                System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chri45n5/source/repos/ChessEngine/ChessEngine/assets/sounds/chess.wav");
+                player.Play();
+            }                              
+        }
+
+        private int CalculateIndexFromPosition(Point point)
+        {
+            int pX = (int)Math.Floor(point.X / 60.0);
+            int pY = (int)Math.Floor(point.Y / 60.0);
+            int index = 8 * pX + pY;
+            return index;
         }
     }
 }

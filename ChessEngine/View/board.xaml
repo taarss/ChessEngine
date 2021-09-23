@@ -5,20 +5,30 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ChessEngine.View"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="480" d:DesignWidth="800"
              DataContext="{StaticResource boardViewModel}">
-    <Canvas x:Name="myCanvas">
-        <ItemsControl ItemsSource="{Binding Path=theGrid}">
+    <Canvas x:Name="myCanvas" MouseLeftButtonUp="placePiece">
+
+        <Grid x:Name="myGrid">
+            
+        </Grid>
+        <ItemsControl ItemsSource = "{Binding TheGrid, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Canvas>
-                        <Rectangle Width="25" Height="25" Fill="Pink"></Rectangle>
+                        <Image 
+                            Width="60"
+                            Height="60"
+                            Source="{Binding piece.Icon}"
+                            Canvas.Left="{Binding ColumnNumber,  UpdateSourceTrigger=PropertyChanged}"
+                            Canvas.Top="{Binding RowNumber, UpdateSourceTrigger=PropertyChanged}"
+                            MouseDown="selectPiece"
+                            ></Image>
+
                     </Canvas>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <Grid x:Name="myGrid">
-        </Grid>
     </Canvas>
 
 </UserControl>
