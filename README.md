@@ -6,8 +6,6 @@
 * [Technologies Used](#technologies-used)
 * [Features](#features)
 * [Project Status](#project-status)
-* [Room for Improvement](#room-for-improvement)
-* [Contact](#contact)
 
 
 ## General Information
