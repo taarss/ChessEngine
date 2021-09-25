@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media.Imaging;
 using ChessEngine.Model;
 using ChessEngine.Model.Piece;
@@ -18,13 +19,8 @@ namespace ChessEngine.ViewModel
         private Piece movePiece = new Piece("Pawn", true);
         private ObservableCollection<Cell> theGrid = new ObservableCollection<Cell>();
         private MoveLogic moveLogic = new();
-
-
-
-
-
-
-
+        private Coordinate followPieceCoordinates = new Coordinate(100, 100);
+        private Debuger debuger = new();
 
 
         public Piece MovePiece { get => movePiece; set => movePiece = value; }
@@ -32,6 +28,8 @@ namespace ChessEngine.ViewModel
         public ObservableCollection<Cell> TheGrid { get => theGrid; set => theGrid = value; }
         public bool IsWhitesTurn { get => isWhitesTurn; set => isWhitesTurn = value; }
         public List<Move> Moves { get => moves; set => moves = value; }
+        public Coordinate FollowPieceCoordinates { get => followPieceCoordinates; set => followPieceCoordinates = value; }
+        public Debuger Debuger { get => debuger; set => debuger = value; }
 
         public BoardViewModel()
         {
@@ -90,7 +88,7 @@ namespace ChessEngine.ViewModel
             }
         }
 
-        private int[] IndexToCoordinate(int index)
+        public int[] IndexToCoordinate(int index)
         {
             int[] result = new int[2];
             int y = (int)MathF.Ceiling(index / 8);

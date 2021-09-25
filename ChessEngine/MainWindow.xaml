@@ -6,13 +6,13 @@
         xmlns:local="clr-namespace:ChessEngine"
         xmlns:views="clr-namespace:ChessEngine.View"
         mc:Ignorable="d"
-        Title="MainWindow" Height="520" Width="800">
+        Title="MainWindow" Height="519" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="500"/>
+            <ColumnDefinition Width="480"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <views:Board x:Name="name"/>
-
+        <views:Board x:Name="name" Grid.Column="0"/>
+        <views:UserControl1 x:Name="sidemenu" Grid.Column="1"/> 
     </Grid>
 </Window>
