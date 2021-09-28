@@ -49,20 +49,14 @@ namespace ChessEngine.ViewModel
 
         private void FENLoader(string FenString)
         {
-            var pieceTypeFromSymbol = new Dictionary<char, Piece>
+            var pieceTypeFromSymbol = new Dictionary<char, string>
             {
-                ['k'] = new Piece("King", false),
-                ['p'] = new Piece("Pawn", false),
-                ['n'] = new Piece("Knight", false),
-                ['b'] = new Piece("Bishop", false),
-                ['q'] = new Piece("Queen", false),
-                ['r'] = new Piece("Rook", false),
-                ['K'] = new Piece("King", true),
-                ['P'] = new Piece("Pawn", true),
-                ['N'] = new Piece("Knight", true),
-                ['B'] = new Piece("Bishop", true),
-                ['Q'] = new Piece("Queen", true),
-                ['R'] = new Piece("Rook", true),
+                ['k'] = "King",
+                ['p'] = "Pawn",
+                ['n'] = "Knight",
+                ['b'] = "Bishop",
+                ['q'] = "Queen",
+                ['r'] = "Rook",               
             };
             char[] fenChars = FenString.ToCharArray();
             int index = 0;
@@ -77,8 +71,8 @@ namespace ChessEngine.ViewModel
 
                 }
                 else
-                {
-                    Piece result = pieceTypeFromSymbol[item];
+                {                  
+                    Piece result = new Piece(pieceTypeFromSymbol[Char.ToLower(item)], char.IsUpper(item));
                     int[] coordinate = IndexToCoordinate(index);
                     Cell cell = new Cell(coordinate[0], coordinate[1]);
                     cell.piece = result;

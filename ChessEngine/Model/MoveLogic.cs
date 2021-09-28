@@ -91,49 +91,117 @@ namespace ChessEngine.Model
                     {
                         GenerateKnightMove(startingPosition, piece);
                     }
+                    else if (piece.Name == "King")
+                    {
+                        GenerateKingMove(startingPosition, piece);
+                    }
                 }
             }
             return moves;
         }
 
-        private void GenerateKnightMove(int startSquare, Piece.Piece piece)
+        private void GenerateKingMove(int startSquare, Piece.Piece piece)
         {
-            /*
-            int[] dir = new int[] { -17, -15, -10, -6, 10, 17, 15, 6 };          
-            foreach (var item in dir)
+            int[] dirRank8 = new int[] { -8, 8, 1, 9, -7 };
+            int[] dirRank0 = new int[] { -8, 8, -1, -9, 7 };
+            int[] dirAll = new int[] { -8, 8, 1, -1, 7, -7, 9, -9 };
+            switch (startSquare % 8)
             {
-                if (startSquare % 8 == 7)
-                {
+                case 7:
+                    GenerateKingMoveRankChecker(dirRank0, startSquare);
+                    break;
+                case 0:
+                    GenerateKingMoveRankChecker(dirRank8, startSquare);
+                    break;
 
-                }
-
-
-                if (startSquare + item >= 0 && startSquare + item < 64)
-                {
-                    moves.Add(new Move(startSquare, startSquare + item));
-                }
-
-
+                default:
+                    GenerateKingMoveRankChecker(dirAll, startSquare);
+                    break;
             }
-            */
-
-            //New version ^^
-            //Please help i have no clue how to calculate the edges of the board.
-
-
-
-
         }
 
+        private void GenerateKingMoveRankChecker(int[] dir, int startSquare)
+        {
+            foreach (var item in dir)
+            {              
+                if (startSquare + item >= 0 && startSquare + item < 64)
+                {
+                    if (boardViewModel.TheGrid[startSquare + item].piece == null)
+                    {
+                        moves.Add(new Move(startSquare, startSquare + item));
+                    }
+                    else
+                    {
+                        if (boardViewModel.TheGrid[startSquare + item].piece.IsWhite != friendlyColor)
+                        {
+                            moves.Add(new Move(startSquare, startSquare + item));
+
+                        }
+                    }
+                }
+            }
+        }
+
+
+        private void GenerateKnightMove(int startSquare, Piece.Piece piece)
+        {
+            int[] dirAll = new int[] { -17, -15, -10, -6, 10, 17, 15, 6 };
+            int[] dirRank0 = new int[] { -6, -15, 10, 17 };
+            int[] dirRank1 = new int[] { -17, -15, -6, 10, 17, 15 };
+            int[] dirRank7 = new int[] { 17, -15, -10,  -17, 15, 6};
+            int[] dirRank8 = new int[] { -17, -10, 15, 6 };
+
+            switch (startSquare % 8)
+            {
+                case 7:
+                    KnightMoveRankChecker(dirRank8, startSquare);
+                    break;
+                case 6:
+                    KnightMoveRankChecker(dirRank7, startSquare);
+                    break;
+                case 0:
+                    KnightMoveRankChecker(dirRank0, startSquare);
+                    break;
+                case 1:
+                    KnightMoveRankChecker(dirRank1, startSquare);
+                    break;
+                default:
+                    KnightMoveRankChecker(dirAll, startSquare);
+                    break;
+            }                    
+        }
+        private void KnightMoveRankChecker(int[] dir, int startSquare)
+        {
+            foreach (var item in dir)
+            {              
+                if (startSquare + item >= 0 && startSquare + item < 64)
+                {
+                    if (boardViewModel.TheGrid[startSquare + item].piece == null)
+                    {
+                        moves.Add(new Move(startSquare, startSquare + item));
+                    }
+                    else
+                    {
+                        if (boardViewModel.TheGrid[startSquare + item].piece.IsWhite != friendlyColor)
+                        {
+                            moves.Add(new Move(startSquare, startSquare + item));
+
+                        }
+                    }
+                }
+            }
+        }
 
         private void GeneratePawnMove(int startSquare, Piece.Piece piece)
         {
             var dirs = (piece.IsWhite) ? new[] { -9, -7 } : new[] { 9, 7 };
             var pushDir = (piece.IsWhite) ? new[] { -8, -16 } : new[] { 8, 16 };
+
             if (!piece.HasMoved && boardViewModel.TheGrid[startSquare + pushDir[1]].piece == null)
-             {
+            {
                  moves.Add(new Move(startSquare, startSquare + pushDir[1]));
-             }
+            }
+
             if (boardViewModel.TheGrid[startSquare + pushDir[0]].piece == null)
             {
                 moves.Add(new Move(startSquare, startSquare + pushDir[0]));

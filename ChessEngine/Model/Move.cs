@@ -16,5 +16,11 @@ namespace ChessEngine.Model
             StartSquare = startSquare;
             TargetSquare = targetSquare;
         }
+
+        public Move(int startSquare, int targetSquare)
+        {
+            StartSquare = startSquare;
+            TargetSquare = targetSquare;
+        }
     }
 }

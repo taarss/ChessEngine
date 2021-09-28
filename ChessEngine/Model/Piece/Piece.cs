@@ -13,7 +13,7 @@ namespace ChessEngine.Model.Piece
         private int value;
         private bool isWhite;
         private bool hasMoved = false;
-        private string icon = "C:/Users/chris/Source/Repos/ChessEngine/ChessEngine/assets/pieces/";
+        private string icon = "C:/Users/chri45n5/source/repos/ChessEngine/ChessEngine/assets/pieces/";
         public Piece(string name, bool isWhite)
         {
             this.name = name;

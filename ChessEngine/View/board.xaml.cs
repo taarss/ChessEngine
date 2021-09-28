@@ -105,13 +105,15 @@ namespace ChessEngine.View
                 {
                     if (item.TargetSquare == index)
                     {
+
+                        Console.WriteLine(boardViewModel.TheGrid);
+                        selectedPiece.HasMoved = true;
                         boardViewModel.TheGrid[index].piece = selectedPiece;
-                        boardViewModel.TheGrid[index].piece.HasMoved = true;
                         boardViewModel.TheGrid[oldIndex].piece = null;
                         boardViewModel.Debuger.RecordMove(item.StartSquare, item.TargetSquare, selectedPiece);
                         selectedPiece = null;
                         UnmarkLegalMoves();
-                        System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chris/Source/Repos/ChessEngine/ChessEngine/assets/sounds/chess.wav");
+                        System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chri45n5/source/repos/ChessEngine/ChessEngine/assets/sounds/chess.wav");
                         player.Play();
                         isDragging = false;
                         followPiece.Visibility = Visibility.Collapsed;
@@ -139,7 +141,6 @@ namespace ChessEngine.View
             {
                 int[] move = boardViewModel.IndexToCoordinate(item.TargetSquare);
                 Rectangle rectangle = myGridOverlay.Children.Cast<Rectangle>().First(e => Grid.GetRow(e) == move[0] && Grid.GetColumn(e) == move[1]);
-
                 rectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.Yellow);
                 rectangle.Opacity = 0.3;
             }
