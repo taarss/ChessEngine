@@ -6,5 +6,7 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ChessEngine:BoardViewModel x:Key="boardViewModel"/>
+        <FontFamily x:Key="NotoSans">./fonts/NotoSansDisplay-VariableFont_wdth,wght.ttf#Noto Sans</FontFamily>
+        <FontFamily x:Key="Gemunu">./fonts/GemunuLibre-VariableFont_wght.ttf#Gemunu</FontFamily>
     </Application.Resources>
 </Application>

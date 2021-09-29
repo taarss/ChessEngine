@@ -52,7 +52,7 @@ namespace ChessEngine.ViewModel
             //FENLoader("1n4n1/8/8/8/8/8/8/1N4N1");
 
             //Sliding pieces debug
-            //FENLoader("r1bq1b1r/8/8/8/8/8/8/R1BQ1B1R");
+            //FENLoader("2b11b2/pppppppp/8/8/8/8/8/R1BQ1B1R");
 
             //Test 1
             //FENLoader("r6r/1b2k1bq/8/8/7B/8/8/R3K2R");
@@ -105,9 +105,6 @@ namespace ChessEngine.ViewModel
             return result;
         }
 
-        public bool isMoveLegal(Piece piece)
-        {
-            throw new NotImplementedException();
-        }
+       
     }
 }

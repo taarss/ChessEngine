@@ -5,20 +5,31 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ChessEngine.View"
              mc:Ignorable="d" 
-             d:DesignHeight="480" d:DesignWidth="320"
+             d:DesignHeight="480" d:DesignWidth="920"
              DataContext="{StaticResource boardViewModel}">
     <Grid>
         <Canvas>
-            <Rectangle x:Name="background" Height="480" Width="320"></Rectangle>
-            <StackPanel Orientation="Horizontal" Height="400" Width="202" Canvas.Left="38" Canvas.Top="38">
-                <ItemsControl ItemsSource = "{Binding Debuger.MoveRecordings, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock FontSize="20" Foreground="White" Text="{Binding}"></TextBlock>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+            <Rectangle x:Name="background" Height="480" Width="920"></Rectangle>
+            <TextBlock FontWeight="DemiBold"  FontSize="30" Foreground="White" Canvas.Left="81">Moves</TextBlock>
+            <Border  BorderBrush="White" BorderThickness="3"  Canvas.Left="38" Canvas.Top="38">
+                <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Visible">
+                    <StackPanel Background="LightGray" Orientation="Horizontal" Height="400" Width="177">
+                        <ItemsControl ItemsSource = "{Binding Debuger.MoveRecordings, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontWeight="DemiBold" FontSize="20" Foreground="Black" Text="{Binding}"></TextBlock>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+
+            </Border>
+            <StackPanel x:Name="testResults" Orientation="Vertical" Height="332" Width="453" Canvas.Left="269" Canvas.Top="42">
+
             </StackPanel>
-        </Canvas>   
+            <Button Canvas.Left="461" Canvas.Top="399" Click="Button_Click" Width="175" Height="38">Run Test</Button>
+            <Button Canvas.Left="271" Canvas.Top="399"  Width="175" Height="38" Click="Button_Click_1">Clear Results</Button>
+        </Canvas>
     </Grid>
 </UserControl>

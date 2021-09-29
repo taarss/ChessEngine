@@ -68,6 +68,40 @@ namespace ChessEngine.Model
         List<Move> moves;
 
 
+        public List<Move> GenerateMoves()
+        {
+             boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
+            moves = new List<Move>();
+            for (int startSquare = 0; startSquare < 64; startSquare++)
+            {
+                if (boardViewModel.TheGrid[startSquare].piece != null)
+                {
+                    Piece.Piece piece = boardViewModel.TheGrid[startSquare].piece;
+                    if (piece.IsWhite == boardViewModel.IsWhitesTurn)
+                    {
+                        if (piece.Name == "Rook" || piece.Name == "Queen" || piece.Name == "Bishop")
+                        {
+                            GenerateSlidingMoves(startSquare, piece);
+                        }
+                        if (piece.Name == "Pawn")
+                        {
+                            GeneratePawnMove(startSquare, piece);
+                        }
+                        if (piece.Name == "King")
+                        {
+                            GenerateKingMove(startSquare, piece);
+                        }
+                        if (piece.Name == "Knight")
+                        {
+                            GenerateKnightMove(startSquare, piece);
+                        }
+                    }
+                }
+                
+            }
+            return moves;
+        }
+
 
         public List<Move> GenerateAttackMap()
         {
@@ -82,7 +116,7 @@ namespace ChessEngine.Model
                     {
                         if (piece.Name == "Rook" || piece.Name == "Bishop" || piece.Name == "Queen")
                         {
-                            //GenerateSlidingMoves(startSquare, piece);
+                            GenerateSlidingMoves(startSquare, piece);
                         }
                         if (piece.Name == "Pawn")
                         {
@@ -218,9 +252,9 @@ namespace ChessEngine.Model
                         if (boardViewModel.TheGrid[startSquare + item].piece.IsWhite != boardViewModel.IsWhitesTurn)
                         {
                             moves.Add(new Move(startSquare, startSquare + item));
-                            AttackMap.Add(new Move(startSquare, startSquare + item));
-
                         }
+                        AttackMap.Add(new Move(startSquare, startSquare + item));
+
                     }
                 }
             }
@@ -318,17 +352,20 @@ namespace ChessEngine.Model
                     {
                         if (pieceOnTargetSquare.IsWhite == boardViewModel.IsWhitesTurn)
                         {
+                            AttackMap.Add(new Move(startSquare, targetSquare));
                             break;
                         }
                     }
-                    moves.Add(new Move(startSquare, targetSquare));
                     AttackMap.Add(new Move(startSquare, targetSquare));
+                    moves.Add(new Move(startSquare, targetSquare));
                     
 
+                    //Can't move further in this direction after capturing opponents piece
                     if (pieceOnTargetSquare != null)
                     {
-                        if (pieceOnTargetSquare.IsWhite == boardViewModel.IsWhitesTurn)
+                        if (pieceOnTargetSquare.IsWhite != boardViewModel.IsWhitesTurn)
                         {
+                            AttackMap.Add(new Move(startSquare, targetSquare));
                             break;
                         }
                     }

@@ -122,11 +122,12 @@ namespace ChessEngine.View
                         }
                         boardViewModel.MoveLogic.MakeMove(item.StartSquare, item.TargetSquare, selectedPiece);
                         UnmarkLegalMoves();
-                        System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chri45n5/source/repos/ChessEngine/ChessEngine/assets/sounds/chess.wav");
+                        //System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chri45n5/source/repos/ChessEngine/ChessEngine/assets/sounds/chess.wav");
+                        System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chris/Source/Repos/Chess/ChessEngine/assets/sounds/chess.wav");
                         player.Play();
                         isDragging = false;
                         followPiece.Visibility = Visibility.Collapsed;
-                        //boardViewModel.MoveLogic.SwitchTurn();
+                        boardViewModel.MoveLogic.SwitchTurn();
                         break;
                     }
                     boardViewModel.TheGrid[oldIndex].piece = selectedPiece;

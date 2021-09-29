@@ -14,7 +14,9 @@ namespace ChessEngine.Model.Piece
         private bool isWhite;
         private bool hasMoved = false;
         private bool hasDoublePushed = false;
-        private string icon = "C:/Users/chri45n5/source/repos/ChessEngine/ChessEngine/assets/pieces/";
+        //private string icon = "C:/Users/chri45n5/source/repos/ChessEngine/ChessEngine/assets/pieces/";
+        private string icon = "C:/Users/chris/Source/Repos/Chess/ChessEngine/assets/pieces/";
+
         public Piece(string name, bool isWhite)
         {
             this.name = name;

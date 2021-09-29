@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ChessEngine"
         xmlns:views="clr-namespace:ChessEngine.View"
         mc:Ignorable="d"
-        Title="MainWindow" Height="519" Width="800">
+        Title="MainWindow" Height="519" Width="1200">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="480"/>

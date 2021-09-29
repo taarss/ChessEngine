@@ -1,5 +1,7 @@
-﻿using System;
+﻿using ChessEngine.ViewModel;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,10 +22,51 @@ namespace ChessEngine.View
     /// </summary>
     public partial class UserControl1 : UserControl
     {
+        private int[] expectedPly = { 1, 20, 400, 8902, 197281, 4865609 };
+        private BoardViewModel boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
         public UserControl1()
         {
             InitializeComponent();
             background.Fill = new SolidColorBrush(Color.FromRgb(51, 51, 51));
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Stopwatch stopwatch = new();
+            for (int i = 0; i < 6; i++)
+            {
+                stopwatch.Start();
+                int result = boardViewModel.Debuger.MoveGenerationTest(i);
+                stopwatch.Stop();
+                TextBlock text = new();
+                StackPanel canvas = new();
+                TextBlock block = new();
+                canvas.Orientation = Orientation.Horizontal;
+                if (result != expectedPly[i])
+                {
+                    block.Text = "✕";
+                    block.Foreground = new SolidColorBrush(Colors.Red);
+                }
+                else
+                {
+                    block.Text = "✔";
+                    block.Foreground = new SolidColorBrush(Colors.Green);
+                }
+                block.Width = 20;
+                text.Text = "Depth: " + i + " ply    " + "Result: " + result + "  Time: " + stopwatch.ElapsedMilliseconds + " milliseconds";
+                text.FontSize = 15;
+                text.Foreground = new SolidColorBrush(Colors.White);
+                
+                canvas.Children.Add(block);
+                canvas.Children.Add(text);
+                canvas.Height = 50;
+                testResults.Children.Add(canvas);
+            }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            testResults.Children.Clear();
         }
     }
 }

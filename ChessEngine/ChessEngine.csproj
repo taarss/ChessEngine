@@ -7,7 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="assets\fonts\GemunuLibre-VariableFont_wght.ttf" />
+    <None Remove="assets\fonts\NotoSansDisplay-VariableFont_wdth,wght.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="assets\pieces\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="assets\fonts\GemunuLibre-VariableFont_wght.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\fonts\NotoSansDisplay-VariableFont_wdth,wght.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
