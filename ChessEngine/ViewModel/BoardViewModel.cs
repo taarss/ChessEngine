@@ -30,6 +30,7 @@ namespace ChessEngine.ViewModel
         public List<Move> Moves { get => moves; set => moves = value; }
         public Coordinate FollowPieceCoordinates { get => followPieceCoordinates; set => followPieceCoordinates = value; }
         public Debuger Debuger { get => debuger; set => debuger = value; }
+        public MoveLogic MoveLogic { get => moveLogic; set => moveLogic = value; }
 
         public BoardViewModel()
         {
@@ -39,12 +40,24 @@ namespace ChessEngine.ViewModel
                 theGrid.Add(new Cell(coordinates[0], coordinates[1]));
             }
             LoadDefaultPosition();
-            moveLogic.PrecomputedMoveData();
+            MoveLogic.PrecomputedMoveData();
         }
 
         private void LoadDefaultPosition()
         {
+            //Normal start position
             FENLoader("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+
+            //Knight debug fen string
+            //FENLoader("1n4n1/8/8/8/8/8/8/1N4N1");
+
+            //Sliding pieces debug
+            //FENLoader("r1bq1b1r/8/8/8/8/8/8/R1BQ1B1R");
+
+            //Test 1
+            //FENLoader("r6r/1b2k1bq/8/8/7B/8/8/R3K2R");
+
+
         }
 
         private void FENLoader(string FenString)
@@ -94,7 +107,6 @@ namespace ChessEngine.ViewModel
 
         public bool isMoveLegal(Piece piece)
         {
-            moveLogic.GenerateMoves();
             throw new NotImplementedException();
         }
     }

@@ -86,42 +86,53 @@ namespace ChessEngine.View
             Point position = Mouse.GetPosition(myCanvas);
             oldIndex = CalculateIndexFromPosition(position);
             selectedPiece = boardViewModel.TheGrid[oldIndex].piece;
-            boardViewModel.TheGrid[oldIndex].piece = null;
-            MoveLogic moveLogic = new();
-            moveLogic.PrecomputedMoveData();
-            moves = moveLogic.GenerateMoveForPiece(selectedPiece, oldIndex);
-            MarkLegalMoves(moves);
-            isDragging = true;
-            followPiece.Visibility = Visibility.Visible;
+            if (selectedPiece.IsWhite == boardViewModel.IsWhitesTurn)
+            {
+                boardViewModel.TheGrid[oldIndex].piece = null;
+                MoveLogic moveLogic = new();
+                moveLogic.PrecomputedMoveData();
+                moves = moveLogic.GenerateMoveForPiece(selectedPiece, oldIndex);
+                MarkLegalMoves(moves);
+                isDragging = true;
+                followPiece.Visibility = Visibility.Visible;
+            }
+            
         }
 
         private void placePiece(object sender, MouseButtonEventArgs e)
         {
+
             if (selectedPiece != null)
             {
+
                 Point position = Mouse.GetPosition(myCanvas);
                 int index = CalculateIndexFromPosition(position);
                 foreach (var item in moves)
                 {
                     if (item.TargetSquare == index)
                     {
-
-                        Console.WriteLine(boardViewModel.TheGrid);
-                        selectedPiece.HasMoved = true;
-                        boardViewModel.TheGrid[index].piece = selectedPiece;
-                        boardViewModel.TheGrid[oldIndex].piece = null;
-                        boardViewModel.Debuger.RecordMove(item.StartSquare, item.TargetSquare, selectedPiece);
-                        selectedPiece = null;
+                        if (item.isCastleMove)
+                        {
+                            boardViewModel.MoveLogic.MakeMove(item.StartSquare, item.TargetSquare, selectedPiece);
+                            boardViewModel.MoveLogic.MakeMove(item.CastleStart, item.CastleTarget, boardViewModel.TheGrid[item.CastleStart].piece);
+                        }
+                        if (item.isEnPassent)
+                        {
+                            boardViewModel.MoveLogic.RemovePieceAtIndex(item.EnPassentIndex);
+                        }
+                        boardViewModel.MoveLogic.MakeMove(item.StartSquare, item.TargetSquare, selectedPiece);
                         UnmarkLegalMoves();
                         System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chri45n5/source/repos/ChessEngine/ChessEngine/assets/sounds/chess.wav");
                         player.Play();
                         isDragging = false;
                         followPiece.Visibility = Visibility.Collapsed;
+                        //boardViewModel.MoveLogic.SwitchTurn();
                         break;
                     }
-
+                    boardViewModel.TheGrid[oldIndex].piece = selectedPiece;
                 }
-                boardViewModel.TheGrid[oldIndex].piece = selectedPiece;
+                boardViewModel.MoveLogic.AttackMap = new();
+                MarkAllAttackedSquares(boardViewModel.MoveLogic.GenerateAttackMap());
             }
             isDragging = false;
             followPiece.Visibility = Visibility.Collapsed;
@@ -153,6 +164,18 @@ namespace ChessEngine.View
                 item.Fill = Brushes.Transparent;
             }
         }
+
+        private void MarkAllAttackedSquares(List<Move> attakcs)
+        {
+            foreach (var item in attakcs)
+            {
+                int[] move = boardViewModel.IndexToCoordinate(item.TargetSquare);
+                Rectangle rectangle = myGridOverlay.Children.Cast<Rectangle>().First(e => Grid.GetRow(e) == move[0] && Grid.GetColumn(e) == move[1]);
+                rectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.Red);
+                rectangle.Opacity = 0.3;
+            }
+        }
+
 
         private void Rectangle_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {

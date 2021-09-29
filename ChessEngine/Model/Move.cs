@@ -10,17 +10,31 @@ namespace ChessEngine.Model
     {
         public int StartSquare;
         public int TargetSquare;
+        public int CastleTarget;
+        public int CastleStart;
+        public int EnPassentIndex;
+        public bool isCastleMove = false;
+        public bool isEnPassent = false;
 
         public Move(int startSquare, int targetSquare)
         {
             StartSquare = startSquare;
             TargetSquare = targetSquare;
         }
-
-        public Move(int startSquare, int targetSquare)
+        public Move(int startSquare, int targetSquare, int enPassentIndex)
         {
             StartSquare = startSquare;
             TargetSquare = targetSquare;
+            EnPassentIndex = enPassentIndex;
+            isEnPassent = true;
+        }
+        public Move(int startSquare, int targetSquare, int castleTarget, int castleStart)
+        {
+            StartSquare = startSquare;
+            TargetSquare = targetSquare;
+            CastleTarget = castleTarget;
+            CastleStart = castleStart;
+            isCastleMove = true;
         }
     }
 }

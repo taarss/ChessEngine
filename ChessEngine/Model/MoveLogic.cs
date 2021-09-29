@@ -13,9 +13,31 @@ namespace ChessEngine.Model
         public static readonly int[] DirectionOffsets = { 8, -8, -1, 1, 7, -7, 9, -9 };
         public int[][] NumSquaresToEdge = new int[64][];
         private BoardViewModel boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
-        private bool friendlyColor = true;
+        public List<Move> AttackMap = new();
+
+        public void MakeMove(int startSquare, int targetSquare, Piece.Piece selectedPiece)
+        {
+            BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
+            selectedPiece.HasMoved = true;
+            temp.TheGrid[targetSquare].piece = selectedPiece;
+            temp.TheGrid[startSquare].piece = null;
+            temp.Debuger.RecordMove(startSquare, targetSquare, selectedPiece);            
+        }
+
+        public void SwitchTurn()
+        {
+            BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
+            temp.IsWhitesTurn = !temp.IsWhitesTurn;
+        }
 
 
+        public void RemovePieceAtIndex(int index)
+        {
+            BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
+            temp.TheGrid[index].piece = null;
+        }
+        
+        
         public void PrecomputedMoveData()
         {
             for (int file = 0; file < 8; file++)
@@ -43,35 +65,43 @@ namespace ChessEngine.Model
                 }
             }
         }
-
         List<Move> moves;
 
 
 
-
-
-        public List<Move> GenerateMoves()
+        public List<Move> GenerateAttackMap()
         {
             moves = new List<Move>();
+            boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
             for (int startSquare = 0; startSquare < 64; startSquare++)
             {
                 Piece.Piece piece = boardViewModel.TheGrid[startSquare].piece;
                 if (boardViewModel.TheGrid[startSquare].piece != null)
                 {
-                    if (piece.IsWhite == boardViewModel.IsWhitesTurn)
+                    if (piece.IsWhite != boardViewModel.IsWhitesTurn)
                     {
                         if (piece.Name == "Rook" || piece.Name == "Bishop" || piece.Name == "Queen")
                         {
-                            GenerateSlidingMoves(startSquare, piece);
+                            //GenerateSlidingMoves(startSquare, piece);
+                        }
+                        if (piece.Name == "Pawn")
+                        {
+                           GeneratePawnMove(startSquare, piece);
+                        }
+                        if (piece.Name == "King")
+                        {
+                            GenerateKingMove(startSquare, piece);
+                        }
+                        if (piece.Name == "Knight")
+                        {
+                            GenerateKnightMove(startSquare, piece);
                         }
                     }
                 }
                          
             }
-            return moves;
+            return AttackMap;
         }
-
-
         public List<Move> GenerateMoveForPiece(Piece.Piece piece, int startingPosition)
         {
             moves = new List<Move>();
@@ -108,19 +138,19 @@ namespace ChessEngine.Model
             switch (startSquare % 8)
             {
                 case 7:
-                    GenerateKingMoveRankChecker(dirRank0, startSquare);
+                    GenerateKingMoveRankChecker(dirRank0, startSquare, piece);
                     break;
                 case 0:
-                    GenerateKingMoveRankChecker(dirRank8, startSquare);
+                    GenerateKingMoveRankChecker(dirRank8, startSquare, piece);
                     break;
 
                 default:
-                    GenerateKingMoveRankChecker(dirAll, startSquare);
+                    GenerateKingMoveRankChecker(dirAll, startSquare, piece);
                     break;
             }
         }
 
-        private void GenerateKingMoveRankChecker(int[] dir, int startSquare)
+        private void GenerateKingMoveRankChecker(int[] dir, int startSquare, Piece.Piece king)
         {
             foreach (var item in dir)
             {              
@@ -132,14 +162,16 @@ namespace ChessEngine.Model
                     }
                     else
                     {
-                        if (boardViewModel.TheGrid[startSquare + item].piece.IsWhite != friendlyColor)
+                        if (boardViewModel.TheGrid[startSquare + item].piece.IsWhite != boardViewModel.IsWhitesTurn)
                         {
                             moves.Add(new Move(startSquare, startSquare + item));
-
                         }
+                        AttackMap.Add(new Move(startSquare, startSquare + item));
                     }
+                    AttackMap.Add(new Move(startSquare, startSquare + item));
                 }
             }
+            CastleMove(king, startSquare);
         }
 
 
@@ -179,13 +211,45 @@ namespace ChessEngine.Model
                     if (boardViewModel.TheGrid[startSquare + item].piece == null)
                     {
                         moves.Add(new Move(startSquare, startSquare + item));
+                        AttackMap.Add(new Move(startSquare, startSquare + item));
                     }
                     else
                     {
-                        if (boardViewModel.TheGrid[startSquare + item].piece.IsWhite != friendlyColor)
+                        if (boardViewModel.TheGrid[startSquare + item].piece.IsWhite != boardViewModel.IsWhitesTurn)
                         {
                             moves.Add(new Move(startSquare, startSquare + item));
+                            AttackMap.Add(new Move(startSquare, startSquare + item));
 
+                        }
+                    }
+                }
+            }
+        }
+        private void CastleMove(Piece.Piece king, int startSquare)
+        {
+            if (!king.HasMoved && king.Name == "King")
+            {
+                //Castle king side
+                Piece.Piece kingSideRook = boardViewModel.TheGrid[startSquare + 3].piece;
+                if (kingSideRook != null &&  kingSideRook.Name == "Rook")
+                {
+                    if (boardViewModel.TheGrid[startSquare + 1].piece == null && boardViewModel.TheGrid[startSquare + 2].piece == null)
+                    {
+                        if (!kingSideRook.HasMoved)
+                        {
+                            moves.Add(new Move(startSquare, startSquare + 2, startSquare + 1, startSquare + 3));
+                        }
+                    }          
+                }
+                //Castle queen side
+                Piece.Piece queenSideRook = boardViewModel.TheGrid[startSquare - 4].piece;
+                if (queenSideRook != null && queenSideRook.Name == "Rook")
+                {
+                    if (boardViewModel.TheGrid[startSquare - 1].piece == null && boardViewModel.TheGrid[startSquare - 2].piece == null && boardViewModel.TheGrid[startSquare - 3].piece == null)
+                    {
+                        if (!queenSideRook.HasMoved)
+                        {
+                            moves.Add(new Move(startSquare, startSquare - 2, startSquare - 1, startSquare - 4));
                         }
                     }
                 }
@@ -196,22 +260,44 @@ namespace ChessEngine.Model
         {
             var dirs = (piece.IsWhite) ? new[] { -9, -7 } : new[] { 9, 7 };
             var pushDir = (piece.IsWhite) ? new[] { -8, -16 } : new[] { 8, 16 };
-
+            int[] enPassentCheckList = new int[] { -1, 1 };
             if (!piece.HasMoved && boardViewModel.TheGrid[startSquare + pushDir[1]].piece == null)
             {
                  moves.Add(new Move(startSquare, startSquare + pushDir[1]));
+                piece.HasDoublePushed = true;
             }
-
-            if (boardViewModel.TheGrid[startSquare + pushDir[0]].piece == null)
+            if (startSquare > 7)
             {
-                moves.Add(new Move(startSquare, startSquare + pushDir[0]));
+                if (boardViewModel.TheGrid[startSquare + pushDir[0]].piece == null)
+                {
+                    moves.Add(new Move(startSquare, startSquare + pushDir[0]));
+                }
             }
+            foreach (var item in enPassentCheckList)
+            {
+                if (boardViewModel.TheGrid[startSquare + item].piece != null)
+                {
+                    if (boardViewModel.TheGrid[startSquare + item].piece.IsWhite != boardViewModel.IsWhitesTurn)
+                    {
+                        if (boardViewModel.TheGrid[startSquare + item].piece.HasDoublePushed)
+                        {
+                            moves.Add(new Move(startSquare, (startSquare + item) + pushDir[0], startSquare + item));
+                        }
+                    }
+                }
+            }
+                       
             foreach (var item in dirs)
             {
-                if (boardViewModel.TheGrid[startSquare + item].piece != null && boardViewModel.TheGrid[startSquare + item].piece.IsWhite != piece.IsWhite)
+                if (startSquare > 7)
                 {
+                    if (boardViewModel.TheGrid[startSquare + item].piece != null && boardViewModel.TheGrid[startSquare + item].piece.IsWhite != piece.IsWhite)
+                    {
                         moves.Add(new Move(startSquare, startSquare + item));
-                }                   
+                    }
+                    AttackMap.Add(new Move( startSquare, startSquare + item));
+                }
+                                  
             }          
         }
 
@@ -230,16 +316,18 @@ namespace ChessEngine.Model
                     //Blocked my friendly piece
                     if (pieceOnTargetSquare != null)
                     {
-                        if (pieceOnTargetSquare.IsWhite == friendlyColor)
+                        if (pieceOnTargetSquare.IsWhite == boardViewModel.IsWhitesTurn)
                         {
                             break;
                         }
-                    }                   
+                    }
                     moves.Add(new Move(startSquare, targetSquare));
+                    AttackMap.Add(new Move(startSquare, targetSquare));
+                    
 
                     if (pieceOnTargetSquare != null)
                     {
-                        if (pieceOnTargetSquare.IsWhite == false)
+                        if (pieceOnTargetSquare.IsWhite == boardViewModel.IsWhitesTurn)
                         {
                             break;
                         }
