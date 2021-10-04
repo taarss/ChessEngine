@@ -15,11 +15,18 @@ namespace ChessEngine.Model
         public int EnPassentIndex;
         public bool isCastleMove = false;
         public bool isEnPassent = false;
+        public bool IsDoublePush = false;
 
         public Move(int startSquare, int targetSquare)
         {
             StartSquare = startSquare;
             TargetSquare = targetSquare;
+        }
+        public Move(int startSquare, int targetSquare, bool isDoublePush)
+        {
+            StartSquare = startSquare;
+            TargetSquare = targetSquare;
+            IsDoublePush = isDoublePush;
         }
         public Move(int startSquare, int targetSquare, int enPassentIndex)
         {

@@ -18,6 +18,7 @@ namespace ChessEngine.ViewModel
         private List<Move> moves;
         private Piece movePiece = new Piece("Pawn", true);
         private ObservableCollection<Cell> theGrid = new ObservableCollection<Cell>();
+        private Dictionary<int, Piece> pieces = new();
         private MoveLogic moveLogic = new();
         private Coordinate followPieceCoordinates = new Coordinate(100, 100);
         private Debuger debuger = new();
@@ -31,6 +32,7 @@ namespace ChessEngine.ViewModel
         public Coordinate FollowPieceCoordinates { get => followPieceCoordinates; set => followPieceCoordinates = value; }
         public Debuger Debuger { get => debuger; set => debuger = value; }
         public MoveLogic MoveLogic { get => moveLogic; set => moveLogic = value; }
+        public Dictionary<int, Piece> Pieces { get => pieces; set => pieces = value; }
 
         public BoardViewModel()
         {
@@ -55,7 +57,7 @@ namespace ChessEngine.ViewModel
             //FENLoader("2b11b2/pppppppp/8/8/8/8/8/R1BQ1B1R");
 
             //Test 1
-            //FENLoader("r6r/1b2k1bq/8/8/7B/8/8/R3K2R");
+            //FENLoader("7r/1b2k1bq/8/8/7B/8/8/R3K2R");
 
 
         }
@@ -88,6 +90,7 @@ namespace ChessEngine.ViewModel
                     Piece result = new Piece(pieceTypeFromSymbol[Char.ToLower(item)], char.IsUpper(item));
                     int[] coordinate = IndexToCoordinate(index);
                     Cell cell = new Cell(coordinate[0], coordinate[1]);
+                    pieces[index] = result;
                     cell.piece = result;
                     TheGrid[index] = cell;
                     index++;

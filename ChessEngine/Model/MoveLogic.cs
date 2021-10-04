@@ -14,14 +14,41 @@ namespace ChessEngine.Model
         public int[][] NumSquaresToEdge = new int[64][];
         private BoardViewModel boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
         public List<Move> AttackMap = new();
+        public Check check = new();
+        public Dictionary<int, Piece.Piece> recentCaptures = new();
 
-        public void MakeMove(int startSquare, int targetSquare, Piece.Piece selectedPiece)
+        public void MakeMove(Move move)
         {
+            recentCaptures = new();
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
+            Piece.Piece selectedPiece = boardViewModel.TheGrid[move.StartSquare].piece;
             selectedPiece.HasMoved = true;
-            temp.TheGrid[targetSquare].piece = selectedPiece;
-            temp.TheGrid[startSquare].piece = null;
-            temp.Debuger.RecordMove(startSquare, targetSquare, selectedPiece);            
+            if (move.IsDoublePush)
+            {
+                selectedPiece.HasDoublePushed = true;
+            }
+            else
+            {
+                selectedPiece.HasDoublePushed = false;
+            }
+            if (temp.TheGrid[move.TargetSquare].piece != null)
+            {
+                recentCaptures.Add(move.TargetSquare, temp.TheGrid[move.TargetSquare].piece);
+            }
+            temp.Pieces.Remove(move.StartSquare);
+            temp.Pieces[move.TargetSquare] = selectedPiece;
+            temp.TheGrid[move.TargetSquare].piece = selectedPiece;
+            temp.TheGrid[move.StartSquare].piece = null;
+            temp.Debuger.RecordMove(move.StartSquare, move.TargetSquare, selectedPiece);            
+        }
+
+        public void UnmakeMove(Move move)
+        {
+            foreach (var item in recentCaptures)
+            {
+                boardViewModel.TheGrid[item.Key].piece = item.Value;
+            }
+            MakeMove(new Move(move.TargetSquare, move.StartSquare));
         }
 
         public void SwitchTurn()
@@ -103,7 +130,7 @@ namespace ChessEngine.Model
         }
 
 
-        public List<Move> GenerateAttackMap()
+        public void GenerateAttackMapForAll()
         {
             moves = new List<Move>();
             boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
@@ -134,32 +161,34 @@ namespace ChessEngine.Model
                 }
                          
             }
-            return AttackMap;
         }
+       
         public List<Move> GenerateMoveForPiece(Piece.Piece piece, int startingPosition)
         {
-            moves = new List<Move>();
+             boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
+
+            moves = new List<Move>();            
             if (piece != null)
-            {
-                if (piece.IsWhite == boardViewModel.IsWhitesTurn)
-                {
-                    if (piece.Name == "Rook" || piece.Name == "Bishop" || piece.Name == "Queen")
+            {                              
+                    if (piece.IsWhite == boardViewModel.IsWhitesTurn)
                     {
-                        GenerateSlidingMoves(startingPosition, piece);                       
-                    }
-                    else if (piece.Name == "Pawn")
-                    {
-                        GeneratePawnMove(startingPosition, piece);
-                    }
-                    else if(piece.Name == "Knight")
-                    {
-                        GenerateKnightMove(startingPosition, piece);
-                    }
-                    else if (piece.Name == "King")
-                    {
-                        GenerateKingMove(startingPosition, piece);
-                    }
-                }
+                        if (piece.Name == "Rook" || piece.Name == "Bishop" || piece.Name == "Queen")
+                        {
+                            GenerateSlidingMoves(startingPosition, piece);
+                        }
+                        else if (piece.Name == "Pawn")
+                        {
+                            GeneratePawnMove(startingPosition, piece);
+                        }
+                        else if (piece.Name == "Knight")
+                        {
+                            GenerateKnightMove(startingPosition, piece);
+                        }
+                        else if (piece.Name == "King")
+                        {
+                            GenerateKingMove(startingPosition, piece);
+                        }
+                    }                          
             }
             return moves;
         }
@@ -297,10 +326,9 @@ namespace ChessEngine.Model
             int[] enPassentCheckList = new int[] { -1, 1 };
             if (!piece.HasMoved && boardViewModel.TheGrid[startSquare + pushDir[1]].piece == null)
             {
-                 moves.Add(new Move(startSquare, startSquare + pushDir[1]));
-                piece.HasDoublePushed = true;
+                 moves.Add(new Move(startSquare, startSquare + pushDir[1], true));
             }
-            if (startSquare > 7)
+            if (startSquare > 7 && startSquare < 56)
             {
                 if (boardViewModel.TheGrid[startSquare + pushDir[0]].piece == null)
                 {
@@ -320,19 +348,45 @@ namespace ChessEngine.Model
                     }
                 }
             }
-                       
-            foreach (var item in dirs)
+
+            
+            if (startSquare > 7)
             {
-                if (startSquare > 7)
+                if (startSquare % 8 == 0)
                 {
-                    if (boardViewModel.TheGrid[startSquare + item].piece != null && boardViewModel.TheGrid[startSquare + item].piece.IsWhite != piece.IsWhite)
+                    if (boardViewModel.TheGrid[startSquare + dirs[1]].piece != null && boardViewModel.TheGrid[startSquare + dirs[1]].piece.IsWhite != piece.IsWhite)
                     {
-                        moves.Add(new Move(startSquare, startSquare + item));
+                        moves.Add(new Move(startSquare, startSquare + dirs[1]));
                     }
-                    AttackMap.Add(new Move( startSquare, startSquare + item));
                 }
-                                  
-            }          
+                else if (startSquare % 8 == 7)
+                {
+                    if (boardViewModel.TheGrid[startSquare + dirs[0]].piece != null && boardViewModel.TheGrid[startSquare + dirs[0]].piece.IsWhite != piece.IsWhite)
+                    {
+                        moves.Add(new Move(startSquare, startSquare + dirs[0]));
+                    }
+                }
+                else
+                {
+                    foreach (var item in dirs)
+                    {
+                            if (boardViewModel.TheGrid[startSquare + item].piece != null && boardViewModel.TheGrid[startSquare + item].piece.IsWhite != piece.IsWhite)
+                            {
+                                moves.Add(new Move(startSquare, startSquare + item));
+                                AttackMap.Add(new Move(startSquare, startSquare + item));
+                            }
+                        AttackMap.Add(new Move(startSquare, startSquare + item));
+                    }
+                }
+            } 
+            
+
+
+
+
+
+
+                     
         }
 
 

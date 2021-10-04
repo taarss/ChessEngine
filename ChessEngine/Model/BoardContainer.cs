@@ -40,6 +40,7 @@ namespace ChessEngine.Model
             }
         }
 
+
         public event PropertyChangedEventHandler PropertyChanged;
     }
 }

@@ -28,6 +28,7 @@ namespace ChessEngine.View
         private BoardViewModel boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
         private List<Move> moves;
         private bool isDragging = false;
+        
 
         public Board()
         {
@@ -88,11 +89,12 @@ namespace ChessEngine.View
             selectedPiece = boardViewModel.TheGrid[oldIndex].piece;
             if (selectedPiece.IsWhite == boardViewModel.IsWhitesTurn)
             {
-                boardViewModel.TheGrid[oldIndex].piece = null;
-                MoveLogic moveLogic = new();
-                moveLogic.PrecomputedMoveData();
-                moves = moveLogic.GenerateMoveForPiece(selectedPiece, oldIndex);
+                boardViewModel.MoveLogic.PrecomputedMoveData();
+                moves = boardViewModel.MoveLogic.check.GenerateLegelMoves(oldIndex, selectedPiece);
+                //moves = boardViewModel.MoveLogic.GenerateMoveForPiece(selectedPiece,oldIndex);
                 MarkLegalMoves(moves);
+                boardViewModel.MoveLogic.GenerateAttackMapForAll();
+                MarkAllAttackedSquares(boardViewModel.MoveLogic.AttackMap);
                 isDragging = true;
                 followPiece.Visibility = Visibility.Visible;
             }
@@ -104,7 +106,6 @@ namespace ChessEngine.View
 
             if (selectedPiece != null)
             {
-
                 Point position = Mouse.GetPosition(myCanvas);
                 int index = CalculateIndexFromPosition(position);
                 foreach (var item in moves)
@@ -113,17 +114,21 @@ namespace ChessEngine.View
                     {
                         if (item.isCastleMove)
                         {
-                            boardViewModel.MoveLogic.MakeMove(item.StartSquare, item.TargetSquare, selectedPiece);
-                            boardViewModel.MoveLogic.MakeMove(item.CastleStart, item.CastleTarget, boardViewModel.TheGrid[item.CastleStart].piece);
+                            boardViewModel.MoveLogic.MakeMove(new Move(item.StartSquare, item.TargetSquare));
+                            boardViewModel.MoveLogic.MakeMove(new Move(item.CastleStart, item.CastleTarget));
                         }
-                        if (item.isEnPassent)
+                        else if (item.isEnPassent)
                         {
                             boardViewModel.MoveLogic.RemovePieceAtIndex(item.EnPassentIndex);
+                            boardViewModel.MoveLogic.MakeMove(item);
                         }
-                        boardViewModel.MoveLogic.MakeMove(item.StartSquare, item.TargetSquare, selectedPiece);
+                        else
+                        {
+                            boardViewModel.MoveLogic.MakeMove(item);
+                        }
                         UnmarkLegalMoves();
-                        //System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chri45n5/source/repos/ChessEngine/ChessEngine/assets/sounds/chess.wav");
-                        System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chris/Source/Repos/Chess/ChessEngine/assets/sounds/chess.wav");
+                        System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chri45n5/source/repos/ChessEngine/ChessEngine/assets/sounds/chess.wav");
+                        //System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chris/Source/Repos/Chess/ChessEngine/assets/sounds/chess.wav");
                         player.Play();
                         isDragging = false;
                         followPiece.Visibility = Visibility.Collapsed;
@@ -132,8 +137,12 @@ namespace ChessEngine.View
                     }
                     boardViewModel.TheGrid[oldIndex].piece = selectedPiece;
                 }
+                if (moves.Count == 0)
+                {
+                    boardViewModel.TheGrid[oldIndex].piece = selectedPiece;
+                }
                 boardViewModel.MoveLogic.AttackMap = new();
-                MarkAllAttackedSquares(boardViewModel.MoveLogic.GenerateAttackMap());
+                MarkAllAttackedSquares(boardViewModel.MoveLogic.AttackMap);
             }
             isDragging = false;
             followPiece.Visibility = Visibility.Collapsed;
@@ -153,7 +162,14 @@ namespace ChessEngine.View
             {
                 int[] move = boardViewModel.IndexToCoordinate(item.TargetSquare);
                 Rectangle rectangle = myGridOverlay.Children.Cast<Rectangle>().First(e => Grid.GetRow(e) == move[0] && Grid.GetColumn(e) == move[1]);
-                rectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.Yellow);
+                if (item.IsDoublePush)
+                {
+                    rectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.Green);
+                }
+                else
+                {
+                    rectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.Yellow);
+                }
                 rectangle.Opacity = 0.3;
             }
         }

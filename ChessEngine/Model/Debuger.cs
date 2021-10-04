@@ -43,7 +43,9 @@ namespace ChessEngine.Model
             int numPositions = 0;
             foreach (var move in moves)
             {
+                boardViewModel.MoveLogic.MakeMove(move);
                 numPositions += MoveGenerationTest(depth - 1);
+                boardViewModel.MoveLogic.UnmakeMove(move);
             }
             return numPositions;
         }
