@@ -44,11 +44,20 @@ namespace ChessEngine.Model
 
         public void UnmakeMove(Move move)
         {
-            foreach (var item in recentCaptures)
+            if (recentCaptures.Count != 0)
             {
-                boardViewModel.TheGrid[item.Key].piece = item.Value;
+                foreach (var item in recentCaptures)
+                {
+                    boardViewModel.Pieces[move.StartSquare] = boardViewModel.Pieces[move.TargetSquare];
+                    boardViewModel.Pieces[move.TargetSquare] = item.Value;
+                    boardViewModel.TheGrid[move.StartSquare].piece = boardViewModel.TheGrid[move.TargetSquare].piece;
+                    boardViewModel.TheGrid[item.Key].piece = item.Value;
+                }
             }
-            MakeMove(new Move(move.TargetSquare, move.StartSquare));
+            else
+            {
+                MakeMove(new Move(move.TargetSquare, move.StartSquare));
+            }
         }
 
         public void SwitchTurn()

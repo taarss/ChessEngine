@@ -94,7 +94,7 @@ namespace ChessEngine.View
                 //moves = boardViewModel.MoveLogic.GenerateMoveForPiece(selectedPiece,oldIndex);
                 MarkLegalMoves(moves);
                 boardViewModel.MoveLogic.GenerateAttackMapForAll();
-                MarkAllAttackedSquares(boardViewModel.MoveLogic.AttackMap);
+                //MarkAllAttackedSquares(boardViewModel.MoveLogic.AttackMap);
                 isDragging = true;
                 followPiece.Visibility = Visibility.Visible;
             }

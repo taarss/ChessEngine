@@ -31,7 +31,7 @@ namespace ChessEngine.Model
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
             foreach (var item in temp.Pieces)
             {
-                if (item.Value.Name == "King" && item.Value.IsWhite == isWhite)
+                if (item.Value.Name == "King" && item.Value.IsWhite != isWhite)
                 {
                     return item.Key;
                 }
@@ -50,16 +50,30 @@ namespace ChessEngine.Model
                 temp.MoveLogic.MakeMove(moveToVerify);
                 temp.MoveLogic.SwitchTurn();
                 List<Move> opponentResponses = temp.MoveLogic.GenerateMoves();
+                bool resetList = false;
+                List<Move> tempMoves = new();
                 foreach (var item in opponentResponses)
                 {
-                    if (item.TargetSquare == getKing(temp.IsWhitesTurn))
+                    int kingIndex = getKing(temp.IsWhitesTurn);
+                    if (item.TargetSquare == kingIndex)
                     {
-
+                        resetList = true;
+                        break;
                     }
                     else
                     {
-                        legalMoves.Add(moveToVerify);
+                        if(!tempMoves.Contains(moveToVerify))
+                            tempMoves.Add(moveToVerify);
                     }
+                }
+                if (resetList)
+                    tempMoves = new();
+                legalMoves.AddRange(tempMoves);
+                
+                if (opponentResponses.Count == 0)
+                {
+                    legalMoves.Add(moveToVerify);
+
                 }
                 temp.MoveLogic.SwitchTurn();
                 temp.MoveLogic.UnmakeMove(moveToVerify);

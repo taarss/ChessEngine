@@ -48,16 +48,20 @@ namespace ChessEngine.ViewModel
         private void LoadDefaultPosition()
         {
             //Normal start position
-            FENLoader("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+            //FENLoader("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 
             //Knight debug fen string
             //FENLoader("1n4n1/8/8/8/8/8/8/1N4N1");
+
+            //Debug pieces debug
+            //FENLoader("8/p3k3/8/6P1/8/8/8/8");
+
 
             //Sliding pieces debug
             //FENLoader("2b11b2/pppppppp/8/8/8/8/8/R1BQ1B1R");
 
             //Test 1
-            //FENLoader("7r/1b2k1bq/8/8/7B/8/8/R3K2R");
+            FENLoader("7r/1b2k1bq/8/8/7B/8/8/R3K2R");
 
 
         }
