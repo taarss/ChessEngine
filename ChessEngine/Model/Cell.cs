@@ -12,8 +12,6 @@ namespace ChessEngine.Model
     {
         public int RowNumber { get; set; }
         public int ColumnNumber { get; set; }
-        public bool CurrentlyOccupied { get; set; }
-        public bool LegealNextMove { get; set; }
         public Piece.Piece piece { get => Piece; set {
                 Piece = value;
                 RaisePropertyChanged("piece");

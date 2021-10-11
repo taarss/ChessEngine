@@ -18,6 +18,7 @@ namespace ChessEngine.ViewModel
         private bool playerColor = true;
         private bool movePieceEnabled = false;
         private List<Move> moves;
+        public List<Move> AttackMap = new();
         private Piece movePiece = new Piece("Pawn", true);
         private ObservableCollection<Cell> theGrid = new ObservableCollection<Cell>();
         private Dictionary<int, Piece> pieces = new();

@@ -10,7 +10,6 @@ namespace ChessEngine.Model.Piece
     public class Piece
     {
         private string name;
-        private int value;
         private bool isWhite;
         private bool hasMoved = false;
         private bool hasDoublePushed = false;
@@ -25,7 +24,6 @@ namespace ChessEngine.Model.Piece
         }
 
         public string Name { get => name; set => name = value; }
-        public int Value { get => value; set => this.value = value; }
         public bool IsWhite { get => isWhite; set => isWhite = value; }
         public string Icon { get => icon; set => icon = value; }
         public bool HasMoved { get => hasMoved; set => hasMoved = value; }
