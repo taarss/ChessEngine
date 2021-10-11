@@ -47,7 +47,7 @@ namespace ChessEngine.Model
 
             foreach (var moveToVerify in pseudoLegealMoves)
             {
-                temp.MoveLogic.MakeMove(moveToVerify);
+                temp.MoveLogic.MakePseudoMove(moveToVerify);
                 temp.MoveLogic.SwitchTurn();
                 List<Move> opponentResponses = temp.MoveLogic.GenerateMoves();
                 bool resetList = false;
@@ -81,5 +81,49 @@ namespace ChessEngine.Model
             //temp.MoveLogic.recentCaptures = new();
             return legalMoves;
         }
+
+        public List<Move> GenerateAllLegelMoves()
+        {
+            BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
+            List<Move> pseudoLegealMoves = temp.MoveLogic.GenerateMoves();
+            List<Move> legalMoves = new List<Move>();
+
+            foreach (var moveToVerify in pseudoLegealMoves)
+            {
+                temp.MoveLogic.MakePseudoMove(moveToVerify);
+                temp.MoveLogic.SwitchTurn();
+                List<Move> opponentResponses = temp.MoveLogic.GenerateMoves();
+                bool resetList = false;
+                List<Move> tempMoves = new();
+                foreach (var item in opponentResponses)
+                {
+                    int kingIndex = getKing(temp.IsWhitesTurn);
+                    if (item.TargetSquare == kingIndex)
+                    {
+                        resetList = true;
+                        break;
+                    }
+                    else
+                    {
+                        if (!tempMoves.Contains(moveToVerify))
+                            tempMoves.Add(moveToVerify);
+                    }
+                }
+                if (resetList)
+                    tempMoves = new();
+                legalMoves.AddRange(tempMoves);
+
+                if (opponentResponses.Count == 0)
+                {
+                    legalMoves.Add(moveToVerify);
+
+                }
+                temp.MoveLogic.SwitchTurn();
+                temp.MoveLogic.UnmakeMove(moveToVerify);
+            }
+            //temp.MoveLogic.recentCaptures = new();
+            return legalMoves;
+        }
+
     }
 }

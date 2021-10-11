@@ -15,7 +15,7 @@
         <Grid x:Name="myGridOverlay">
 
         </Grid>
-        <ItemsControl ItemsSource = "{Binding TheGrid, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+        <ItemsControl ItemsSource = "{Binding TheGrid, IsAsync=True, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Canvas>

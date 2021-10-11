@@ -8,12 +8,14 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using ChessEngine.Model;
 using ChessEngine.Model.Piece;
+using ChessEngine.Model.AI;
 
 namespace ChessEngine.ViewModel
 {
     public class BoardViewModel
     {
-        private bool isWhitesTurn = true;
+        private bool isWhitesTurn = false;
+        private bool playerColor = true;
         private bool movePieceEnabled = false;
         private List<Move> moves;
         private Piece movePiece = new Piece("Pawn", true);
@@ -22,7 +24,7 @@ namespace ChessEngine.ViewModel
         private MoveLogic moveLogic = new();
         private Coordinate followPieceCoordinates = new Coordinate(100, 100);
         private Debuger debuger = new();
-
+        private AI ai = new();
 
         public Piece MovePiece { get => movePiece; set => movePiece = value; }
         public bool MovePieceEnabled { get => movePieceEnabled; set => movePieceEnabled = value; }
@@ -33,6 +35,8 @@ namespace ChessEngine.ViewModel
         public Debuger Debuger { get => debuger; set => debuger = value; }
         public MoveLogic MoveLogic { get => moveLogic; set => moveLogic = value; }
         public Dictionary<int, Piece> Pieces { get => pieces; set => pieces = value; }
+        public bool PlayerColor { get => playerColor; set => playerColor = value; }
+        public AI Ai { get => ai; set => ai = value; }
 
         public BoardViewModel()
         {
@@ -48,7 +52,7 @@ namespace ChessEngine.ViewModel
         private void LoadDefaultPosition()
         {
             //Normal start position
-            //FENLoader("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+            FENLoader("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 
             //Knight debug fen string
             //FENLoader("1n4n1/8/8/8/8/8/8/1N4N1");
@@ -61,7 +65,7 @@ namespace ChessEngine.ViewModel
             //FENLoader("2b11b2/pppppppp/8/8/8/8/8/R1BQ1B1R");
 
             //Test 1
-            FENLoader("7r/1b2k1bq/8/8/7B/8/8/R3K2R");
+            //FENLoader("7r/1b2k1bq/8/8/7B/8/8/R3K2R");
 
 
         }
@@ -109,6 +113,19 @@ namespace ChessEngine.ViewModel
             int x = index % 8;
             result[0] = x;
             result[1] = y;
+            return result;
+        }
+
+        public List<Piece> GetAllTypePieces(Piece piece)
+        {
+            List<Piece> result = new();
+            foreach (var item in pieces)
+            {
+                if (item.Value.Name == piece.Name && item.Value.IsWhite == piece.IsWhite)
+                {
+                    result.Add(item.Value);
+                }
+            }
             return result;
         }
 

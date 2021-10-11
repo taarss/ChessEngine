@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ChessEngine.Model.AI;
 
 namespace ChessEngine.View
 {
@@ -33,10 +34,10 @@ namespace ChessEngine.View
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Stopwatch stopwatch = new();
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 1; i++)
             {
                 stopwatch.Start();
-                int result = boardViewModel.Debuger.MoveGenerationTest(i);
+                int result = boardViewModel.Debuger.MoveGenerationTest(3);
                 stopwatch.Stop();
                 TextBlock text = new();
                 StackPanel canvas = new();
@@ -67,6 +68,10 @@ namespace ChessEngine.View
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             testResults.Children.Clear();
+
+            int result = boardViewModel.Ai.SearchMoves(2, Int32.MinValue, Int32.MaxValue);
+            boardViewModel.MoveLogic.MakeMove(boardViewModel.Ai.BestMove);
+            boardViewModel.MoveLogic.SwitchTurn();
         }
     }
 }

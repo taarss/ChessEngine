@@ -21,7 +21,7 @@ namespace ChessEngine.Model
         {
             recentCaptures = new();
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
-            Piece.Piece selectedPiece = boardViewModel.TheGrid[move.StartSquare].piece;
+            Piece.Piece selectedPiece = temp.TheGrid[move.StartSquare].piece;
             selectedPiece.HasMoved = true;
             if (move.IsDoublePush)
             {
@@ -39,8 +39,26 @@ namespace ChessEngine.Model
             temp.Pieces[move.TargetSquare] = selectedPiece;
             temp.TheGrid[move.TargetSquare].piece = selectedPiece;
             temp.TheGrid[move.StartSquare].piece = null;
-            temp.Debuger.RecordMove(move.StartSquare, move.TargetSquare, selectedPiece);            
+            temp.Debuger.RecordMove(move.StartSquare, move.TargetSquare, selectedPiece);
+            
         }
+        public void MakePseudoMove(Move move)
+        {
+            recentCaptures = new();
+            BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
+            Piece.Piece selectedPiece = temp.TheGrid[move.StartSquare].piece;
+            if (temp.TheGrid[move.TargetSquare].piece != null)
+            {
+                recentCaptures.Add(move.TargetSquare, temp.TheGrid[move.TargetSquare].piece);
+            }
+            temp.Pieces.Remove(move.StartSquare);
+            temp.Pieces[move.TargetSquare] = selectedPiece;
+            temp.TheGrid[move.TargetSquare].piece = selectedPiece;
+            temp.TheGrid[move.StartSquare].piece = null;
+        }
+
+
+
 
         public void UnmakeMove(Move move)
         {
@@ -56,7 +74,7 @@ namespace ChessEngine.Model
             }
             else
             {
-                MakeMove(new Move(move.TargetSquare, move.StartSquare));
+                MakePseudoMove(new Move(move.TargetSquare, move.StartSquare));
             }
         }
 
@@ -333,7 +351,7 @@ namespace ChessEngine.Model
             var dirs = (piece.IsWhite) ? new[] { -9, -7 } : new[] { 9, 7 };
             var pushDir = (piece.IsWhite) ? new[] { -8, -16 } : new[] { 8, 16 };
             int[] enPassentCheckList = new int[] { -1, 1 };
-            if (!piece.HasMoved && boardViewModel.TheGrid[startSquare + pushDir[1]].piece == null)
+            if (startSquare + pushDir[1] <= 64 && !piece.HasMoved && boardViewModel.TheGrid[startSquare + pushDir[1]].piece == null)
             {
                  moves.Add(new Move(startSquare, startSquare + pushDir[1], true));
             }
@@ -346,7 +364,7 @@ namespace ChessEngine.Model
             }
             foreach (var item in enPassentCheckList)
             {
-                if (boardViewModel.TheGrid[startSquare + item].piece != null)
+                if (startSquare + item >= 0 &&   boardViewModel.TheGrid[startSquare + item].piece != null)
                 {
                     if (boardViewModel.TheGrid[startSquare + item].piece.IsWhite != boardViewModel.IsWhitesTurn)
                     {
