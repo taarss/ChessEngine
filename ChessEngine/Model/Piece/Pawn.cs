@@ -80,24 +80,26 @@ namespace ChessEngine.Model.Piece
                 else if (startSquare % 8 == 7)
                 {
                     //Check if there is a piece and it's not friendly
-                    if (board.TheGrid[startSquare + dirs[0]].piece != null && board.TheGrid[startSquare + dirs[0]].piece.IsWhite != piece.IsWhite)
+                    if (board.TheGrid[startSquare + dirs[0]].piece != null && board.TheGrid[startSquare + dirs[0]].piece.IsWhite != pawn.IsWhite)
                     {
                         moves.Add(new Move(startSquare, startSquare + dirs[0]));
                     }
                 }
                 else
                 {
+                    //The pawn is not on either of the edges
                     foreach (var item in dirs)
                     {
-                        if (boardViewModel.TheGrid[startSquare + item].piece != null && boardViewModel.TheGrid[startSquare + item].piece.IsWhite != piece.IsWhite)
+                        if (board.TheGrid[startSquare + item].piece != null && board.TheGrid[startSquare + item].piece.IsWhite != pawn.IsWhite)
                         {
                             moves.Add(new Move(startSquare, startSquare + item));
-                            AttackMap.Add(new Move(startSquare, startSquare + item));
+                            board.AttackMap.Add(new Move(startSquare, startSquare + item));
                         }
-                        AttackMap.Add(new Move(startSquare, startSquare + item));
+                        board.AttackMap.Add(new Move(startSquare, startSquare + item));
                     }
                 }
             }
+            return moves;
         }
 
     }

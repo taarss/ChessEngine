@@ -346,76 +346,7 @@ namespace ChessEngine.Model
             }
         }
 
-        private void GeneratePawnMove(int startSquare, Piece.Piece piece)
-        {
-            var dirs = (piece.IsWhite) ? new[] { -9, -7 } : new[] { 9, 7 };
-            var pushDir = (piece.IsWhite) ? new[] { -8, -16 } : new[] { 8, 16 };
-            int[] enPassentCheckList = new int[] { -1, 1 };
-            if (startSquare + pushDir[1] <= 64 && !piece.HasMoved && boardViewModel.TheGrid[startSquare + pushDir[1]].piece == null)
-            {
-                 moves.Add(new Move(startSquare, startSquare + pushDir[1], true));
-            }
-            if (startSquare > 7 && startSquare < 56)
-            {
-                if (boardViewModel.TheGrid[startSquare + pushDir[0]].piece == null)
-                {
-                    moves.Add(new Move(startSquare, startSquare + pushDir[0]));
-                }
-            }
-            foreach (var item in enPassentCheckList)
-            {
-                if (startSquare + item >= 0 &&   boardViewModel.TheGrid[startSquare + item].piece != null)
-                {
-                    if (boardViewModel.TheGrid[startSquare + item].piece.IsWhite != boardViewModel.IsWhitesTurn)
-                    {
-                        if (boardViewModel.TheGrid[startSquare + item].piece.HasDoublePushed)
-                        {
-                            moves.Add(new Move(startSquare, (startSquare + item) + pushDir[0], startSquare + item));
-                        }
-                    }
-                }
-            }
-
-            
-            if (startSquare > 7)
-            {
-                if (startSquare % 8 == 0)
-                {
-                    if (boardViewModel.TheGrid[startSquare + dirs[1]].piece != null && boardViewModel.TheGrid[startSquare + dirs[1]].piece.IsWhite != piece.IsWhite)
-                    {
-                        moves.Add(new Move(startSquare, startSquare + dirs[1]));
-                    }
-                }
-                else if (startSquare % 8 == 7)
-                {
-                    if (boardViewModel.TheGrid[startSquare + dirs[0]].piece != null && boardViewModel.TheGrid[startSquare + dirs[0]].piece.IsWhite != piece.IsWhite)
-                    {
-                        moves.Add(new Move(startSquare, startSquare + dirs[0]));
-                    }
-                }
-                else
-                {
-                    foreach (var item in dirs)
-                    {
-                            if (boardViewModel.TheGrid[startSquare + item].piece != null && boardViewModel.TheGrid[startSquare + item].piece.IsWhite != piece.IsWhite)
-                            {
-                                moves.Add(new Move(startSquare, startSquare + item));
-                                AttackMap.Add(new Move(startSquare, startSquare + item));
-                            }
-                        AttackMap.Add(new Move(startSquare, startSquare + item));
-                    }
-                }
-            } 
-            
-
-
-
-
-
-
-                     
-        }
-
+        
 
         private void GenerateSlidingMoves(int startSquare, Piece.Piece piece)
         {
