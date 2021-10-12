@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="480" d:DesignWidth="800"
              DataContext="{StaticResource boardViewModel}">
-    <Canvas x:Name="myCanvas" MouseLeftButtonUp="placePiece" MouseMove="Rectangle_MouseMove">
+    <Canvas x:Name="myCanvas" MouseLeftButtonUp="PlacePiece" MouseMove="Rectangle_MouseMove">
 
         <Grid x:Name="myGrid">
             
@@ -25,7 +25,7 @@
                             Source="{Binding piece.Icon}"
                             Canvas.Left="{Binding ColumnNumber,UpdateSourceTrigger=PropertyChanged}"
                             Canvas.Top="{Binding RowNumber, UpdateSourceTrigger=PropertyChanged}"
-                            MouseDown="selectPiece"
+                            MouseDown="SelectPiece"
                             ></Image>
 
                     </Canvas>

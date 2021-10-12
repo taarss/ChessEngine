@@ -16,7 +16,7 @@ namespace ChessEngine.Model.AI
         const int rookValue = 500;
         const int queenValue = 900;
 
-        public int EvaluateMaterial()
+        public static int EvaluateMaterial()
         {
             BoardViewModel board = (BoardViewModel)App.Current.Resources["boardViewModel"];
             int whiteEval = CountMaterial(true);
@@ -27,7 +27,7 @@ namespace ChessEngine.Model.AI
             return evaluation * perspective;
         }
 
-        private int CountMaterial(bool isWhite)
+        private static int CountMaterial(bool isWhite)
         {
             BoardViewModel board = (BoardViewModel)App.Current.Resources["boardViewModel"];
             int material = 0;

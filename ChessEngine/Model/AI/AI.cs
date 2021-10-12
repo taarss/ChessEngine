@@ -18,10 +18,10 @@ namespace ChessEngine.Model.AI
         public int SearchMoves(int depth, int alpha, int beta)
         {
             BoardViewModel board = (BoardViewModel)App.Current.Resources["boardViewModel"];
-            List<Move> moves = board.MoveLogic.check.GenerateAllLegelMoves();
+            List<Move> moves = Check.GenerateAllLegelMoves();
             if (depth == 0)
             {
-                return evaluate.EvaluateMaterial();
+                return Evaluate.EvaluateMaterial();
             }
 
             if (moves.Count == 0)

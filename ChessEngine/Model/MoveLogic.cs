@@ -15,11 +15,37 @@ namespace ChessEngine.Model
         private BoardViewModel boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
         public List<Move> AttackMap = new();
         public Check check = new();
-        public Dictionary<int, Piece.Piece> recentCaptures = new();
+        public Stack<PreviousMove> recentMoves = new();
+        //public Dictionary<int, Piece.Piece> recentCaptures = new();
+
+        public List<Move> GenerateMoves()
+        {
+            //Generates all moves possible for whoevers turn it is
+            boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
+            List<Move> moves = new();
+
+            //Loop through each square
+            for (int startSquare = 0; startSquare < 64; startSquare++)
+            {
+                //if there is a piece on the square
+                if (boardViewModel.TheGrid[startSquare].piece != null)
+                {
+                    //Get the piece
+                    Piece.Piece piece = boardViewModel.TheGrid[startSquare].piece;
+
+                    //Check if it matches color of whoevers turn it is
+                    if (piece.IsWhite == boardViewModel.IsWhitesTurn)
+                    {
+                        moves = GenerateMovesBoilerPlate(piece, startSquare);
+                    }
+                }
+
+            }
+            return moves;
+        }
 
         public void MakeMove(Move move)
         {
-            recentCaptures = new();
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
             Piece.Piece selectedPiece = temp.TheGrid[move.StartSquare].piece;
             selectedPiece.HasMoved = true;
@@ -27,34 +53,40 @@ namespace ChessEngine.Model
             {
                 selectedPiece.HasDoublePushed = true;
             }
-            else
-            {
-                selectedPiece.HasDoublePushed = false;
-            }
-            if (temp.TheGrid[move.TargetSquare].piece != null)
-            {
-                recentCaptures.Add(move.TargetSquare, temp.TheGrid[move.TargetSquare].piece);
-            }
+
+            recentMoves.Push(new PreviousMove(new CapturedPiece(move.StartSquare, temp.TheGrid[move.TargetSquare].piece), move));
             temp.Pieces.Remove(move.StartSquare);
             temp.Pieces[move.TargetSquare] = selectedPiece;
             temp.TheGrid[move.TargetSquare].piece = selectedPiece;
             temp.TheGrid[move.StartSquare].piece = null;
-            temp.Debuger.RecordMove(move.StartSquare, move.TargetSquare, selectedPiece);
-            
+            temp.Debuger.RecordMove(move.StartSquare, move.TargetSquare, selectedPiece);          
         }
         public void MakePseudoMove(Move move)
         {
-            recentCaptures = new();
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
             Piece.Piece selectedPiece = temp.TheGrid[move.StartSquare].piece;
-            if (temp.TheGrid[move.TargetSquare].piece != null)
-            {
-                recentCaptures.Add(move.TargetSquare, temp.TheGrid[move.TargetSquare].piece);
-            }
+            recentMoves.Push(new PreviousMove(new CapturedPiece(move.StartSquare, temp.TheGrid[move.TargetSquare].piece), move));
             temp.Pieces.Remove(move.StartSquare);
             temp.Pieces[move.TargetSquare] = selectedPiece;
             temp.TheGrid[move.TargetSquare].piece = selectedPiece;
             temp.TheGrid[move.StartSquare].piece = null;
+        }
+        public void PlacePiece(Move move)
+        {
+            if (move.isCastleMove)
+            {
+                boardViewModel.MoveLogic.MakeMove(new Move(move.StartSquare, move.TargetSquare));
+                boardViewModel.MoveLogic.MakeMove(new Move(move.CastleStart, move.CastleTarget));
+            }
+            else if (move.isEnPassent)
+            {
+                RemovePieceAtIndex(move.EnPassentIndex);
+                boardViewModel.MoveLogic.MakeMove(move);
+            }
+            else
+            {
+                boardViewModel.MoveLogic.MakeMove(move);
+            }
         }
 
 
@@ -62,15 +94,14 @@ namespace ChessEngine.Model
 
         public void UnmakeMove(Move move)
         {
-            if (recentCaptures.Count != 0)
+            if (recentMoves.Count != 0)
             {
-                foreach (var item in recentCaptures)
-                {
-                    boardViewModel.Pieces[move.StartSquare] = boardViewModel.Pieces[move.TargetSquare];
-                    boardViewModel.Pieces[move.TargetSquare] = item.Value;
-                    boardViewModel.TheGrid[move.StartSquare].piece = boardViewModel.TheGrid[move.TargetSquare].piece;
-                    boardViewModel.TheGrid[item.Key].piece = item.Value;
-                }
+                PreviousMove previousMove = recentMoves.Pop();
+                boardViewModel.Pieces[move.StartSquare] = boardViewModel.Pieces[move.TargetSquare];
+                boardViewModel.Pieces[move.TargetSquare] = previousMove.Value;
+                boardViewModel.TheGrid[move.StartSquare].piece = boardViewModel.TheGrid[move.TargetSquare].piece;
+                boardViewModel.TheGrid[item.Key].piece = item.Value;
+           
             }
             else
             {
@@ -78,312 +109,66 @@ namespace ChessEngine.Model
             }
         }
 
-        public void SwitchTurn()
+        public static void SwitchTurn()
         {
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
             temp.IsWhitesTurn = !temp.IsWhitesTurn;
         }
 
 
-        public void RemovePieceAtIndex(int index)
+        public static void RemovePieceAtIndex(int index)
         {
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
             temp.TheGrid[index].piece = null;
         }
         
         
-        public void PrecomputedMoveData()
-        {
-            for (int file = 0; file < 8; file++)
-            {
-                for (int rank = 0; rank < 8; rank++)
-                {
-                    int numNorth = 7 - rank;
-                    int numSouth = rank;
-                    int numWest = file;
-                    int numEast = 7 - file;
+     
 
-                    int squareIndex = rank * 8 + file;
+        
 
-                    NumSquaresToEdge[squareIndex] = new int[8];
-                    NumSquaresToEdge[squareIndex][0] = numNorth;
-                    NumSquaresToEdge[squareIndex][1] = numSouth;
-                    NumSquaresToEdge[squareIndex][2] = numWest;
-                    NumSquaresToEdge[squareIndex][3] = numEast;
-                    NumSquaresToEdge[squareIndex][4] = System.Math.Min(numNorth, numWest);
-                    NumSquaresToEdge[squareIndex][5] = System.Math.Min(numSouth, numEast);
-                    NumSquaresToEdge[squareIndex][6] = System.Math.Min(numNorth, numEast);
-                    NumSquaresToEdge[squareIndex][7] = System.Math.Min(numSouth, numWest);
-
-
-                }
-            }
-        }
-        List<Move> moves;
-
-
-        public List<Move> GenerateMoves()
-        {
-             boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
-            moves = new List<Move>();
-            for (int startSquare = 0; startSquare < 64; startSquare++)
-            {
-                if (boardViewModel.TheGrid[startSquare].piece != null)
-                {
-                    Piece.Piece piece = boardViewModel.TheGrid[startSquare].piece;
-                    if (piece.IsWhite == boardViewModel.IsWhitesTurn)
-                    {
-                        if (piece.Name == "Rook" || piece.Name == "Queen" || piece.Name == "Bishop")
-                        {
-                            GenerateSlidingMoves(startSquare, piece);
-                        }
-                        if (piece.Name == "Pawn")
-                        {
-                            GeneratePawnMove(startSquare, piece);
-                        }
-                        if (piece.Name == "King")
-                        {
-                            GenerateKingMove(startSquare, piece);
-                        }
-                        if (piece.Name == "Knight")
-                        {
-                            GenerateKnightMove(startSquare, piece);
-                        }
-                    }
-                }
-                
-            }
-            return moves;
-        }
-
-
-        public void GenerateAttackMapForAll()
-        {
-            moves = new List<Move>();
-            boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
-            for (int startSquare = 0; startSquare < 64; startSquare++)
-            {
-                Piece.Piece piece = boardViewModel.TheGrid[startSquare].piece;
-                if (boardViewModel.TheGrid[startSquare].piece != null)
-                {
-                    if (piece.IsWhite != boardViewModel.IsWhitesTurn)
-                    {
-                        if (piece.Name == "Rook" || piece.Name == "Bishop" || piece.Name == "Queen")
-                        {
-                            GenerateSlidingMoves(startSquare, piece);
-                        }
-                        if (piece.Name == "Pawn")
-                        {
-                           GeneratePawnMove(startSquare, piece);
-                        }
-                        if (piece.Name == "King")
-                        {
-                            GenerateKingMove(startSquare, piece);
-                        }
-                        if (piece.Name == "Knight")
-                        {
-                            GenerateKnightMove(startSquare, piece);
-                        }
-                    }
-                }
-                         
-            }
-        }
        
         public List<Move> GenerateMoveForPiece(Piece.Piece piece, int startingPosition)
         {
-             boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
-
-            moves = new List<Move>();            
+            boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
+            List<Move> moves = new List<Move>();            
             if (piece != null)
             {                              
                     if (piece.IsWhite == boardViewModel.IsWhitesTurn)
                     {
-                        if (piece.Name == "Rook" || piece.Name == "Bishop" || piece.Name == "Queen")
-                        {
-                            GenerateSlidingMoves(startingPosition, piece);
-                        }
-                        else if (piece.Name == "Pawn")
-                        {
-                            GeneratePawnMove(startingPosition, piece);
-                        }
-                        else if (piece.Name == "Knight")
-                        {
-                            GenerateKnightMove(startingPosition, piece);
-                        }
-                        else if (piece.Name == "King")
-                        {
-                            GenerateKingMove(startingPosition, piece);
-                        }
-                    }                          
+                        moves = GenerateMovesBoilerPlate(piece, startingPosition);
+                    }
             }
             return moves;
         }
 
-        private void GenerateKingMove(int startSquare, Piece.Piece piece)
+
+        private List<Move> GenerateMovesBoilerPlate(Piece.Piece piece, int startingPosition)
         {
-            int[] dirRank8 = new int[] { -8, 8, 1, 9, -7 };
-            int[] dirRank0 = new int[] { -8, 8, -1, -9, 7 };
-            int[] dirAll = new int[] { -8, 8, 1, -1, 7, -7, 9, -9 };
-            switch (startSquare % 8)
+            List<Move> moves = new List<Move>();
+            if (piece.Name == "Rook" || piece.Name == "Queen" || piece.Name == "Bishop")
             {
-                case 7:
-                    GenerateKingMoveRankChecker(dirRank0, startSquare, piece);
-                    break;
-                case 0:
-                    GenerateKingMoveRankChecker(dirRank8, startSquare, piece);
-                    break;
-
-                default:
-                    GenerateKingMoveRankChecker(dirAll, startSquare, piece);
-                    break;
+                SlidePiece slidePieces = new();
+                moves = slidePieces.GenerateSlidingMoves(startingPosition, piece);
             }
-        }
-
-        private void GenerateKingMoveRankChecker(int[] dir, int startSquare, Piece.Piece king)
-        {
-            foreach (var item in dir)
-            {              
-                if (startSquare + item >= 0 && startSquare + item < 64)
-                {
-                    if (boardViewModel.TheGrid[startSquare + item].piece == null)
-                    {
-                        moves.Add(new Move(startSquare, startSquare + item));
-                    }
-                    else
-                    {
-                        if (boardViewModel.TheGrid[startSquare + item].piece.IsWhite != boardViewModel.IsWhitesTurn)
-                        {
-                            moves.Add(new Move(startSquare, startSquare + item));
-                        }
-                        AttackMap.Add(new Move(startSquare, startSquare + item));
-                    }
-                    AttackMap.Add(new Move(startSquare, startSquare + item));
-                }
-            }
-            CastleMove(king, startSquare);
-        }
-
-
-        private void GenerateKnightMove(int startSquare, Piece.Piece piece)
-        {
-            int[] dirAll = new int[] { -17, -15, -10, -6, 10, 17, 15, 6 };
-            int[] dirRank0 = new int[] { -6, -15, 10, 17 };
-            int[] dirRank1 = new int[] { -17, -15, -6, 10, 17, 15 };
-            int[] dirRank7 = new int[] { 17, -15, -10,  -17, 15, 6};
-            int[] dirRank8 = new int[] { -17, -10, 15, 6 };
-
-            switch (startSquare % 8)
+            if (piece.Name == "Pawn")
             {
-                case 7:
-                    KnightMoveRankChecker(dirRank8, startSquare);
-                    break;
-                case 6:
-                    KnightMoveRankChecker(dirRank7, startSquare);
-                    break;
-                case 0:
-                    KnightMoveRankChecker(dirRank0, startSquare);
-                    break;
-                case 1:
-                    KnightMoveRankChecker(dirRank1, startSquare);
-                    break;
-                default:
-                    KnightMoveRankChecker(dirAll, startSquare);
-                    break;
-            }                    
-        }
-        private void KnightMoveRankChecker(int[] dir, int startSquare)
-        {
-            foreach (var item in dir)
-            {              
-                if (startSquare + item >= 0 && startSquare + item < 64)
-                {
-                    if (boardViewModel.TheGrid[startSquare + item].piece == null)
-                    {
-                        moves.Add(new Move(startSquare, startSquare + item));
-                        AttackMap.Add(new Move(startSquare, startSquare + item));
-                    }
-                    else
-                    {
-                        if (boardViewModel.TheGrid[startSquare + item].piece.IsWhite != boardViewModel.IsWhitesTurn)
-                        {
-                            moves.Add(new Move(startSquare, startSquare + item));
-                        }
-                        AttackMap.Add(new Move(startSquare, startSquare + item));
-
-                    }
-                }
+                Pawn pawnMoves = new(boardViewModel.IsWhitesTurn);
+                moves = pawnMoves.GeneratePossibleMoves(piece, startingPosition);
             }
-        }
-        private void CastleMove(Piece.Piece king, int startSquare)
-        {
-            if (!king.HasMoved && king.Name == "King")
+            if (piece.Name == "King")
             {
-                //Castle king side
-                Piece.Piece kingSideRook = boardViewModel.TheGrid[startSquare + 3].piece;
-                if (kingSideRook != null &&  kingSideRook.Name == "Rook")
-                {
-                    if (boardViewModel.TheGrid[startSquare + 1].piece == null && boardViewModel.TheGrid[startSquare + 2].piece == null)
-                    {
-                        if (!kingSideRook.HasMoved)
-                        {
-                            moves.Add(new Move(startSquare, startSquare + 2, startSquare + 1, startSquare + 3));
-                        }
-                    }          
-                }
-                //Castle queen side
-                Piece.Piece queenSideRook = boardViewModel.TheGrid[startSquare - 4].piece;
-                if (queenSideRook != null && queenSideRook.Name == "Rook")
-                {
-                    if (boardViewModel.TheGrid[startSquare - 1].piece == null && boardViewModel.TheGrid[startSquare - 2].piece == null && boardViewModel.TheGrid[startSquare - 3].piece == null)
-                    {
-                        if (!queenSideRook.HasMoved)
-                        {
-                            moves.Add(new Move(startSquare, startSquare - 2, startSquare - 1, startSquare - 4));
-                        }
-                    }
-                }
+                King king = new();
+                moves = king.GenerateKingMove(startingPosition, piece);
             }
-        }
-
-        
-
-        private void GenerateSlidingMoves(int startSquare, Piece.Piece piece)
-        {
-            int startDirIndex = (piece.Name == "Bishop") ? 4 : 0;
-            int endDirIndex = (piece.Name == "Rook") ? 4 : 8;
-            for (int directionIndex = startDirIndex; directionIndex < endDirIndex; directionIndex++)
+            if (piece.Name == "Knight")
             {
-                for (int n = 0; n < NumSquaresToEdge[startSquare][directionIndex]; n++)
-                {
-                    int targetSquare = startSquare + DirectionOffsets[directionIndex] * (n + 1);
-                    Piece.Piece pieceOnTargetSquare = boardViewModel.TheGrid[targetSquare].piece;
-
-                    //Blocked my friendly piece
-                    if (pieceOnTargetSquare != null)
-                    {
-                        if (pieceOnTargetSquare.IsWhite == boardViewModel.IsWhitesTurn)
-                        {
-                            AttackMap.Add(new Move(startSquare, targetSquare));
-                            break;
-                        }
-                    }
-                    AttackMap.Add(new Move(startSquare, targetSquare));
-                    moves.Add(new Move(startSquare, targetSquare));
-                    
-
-                    //Can't move further in this direction after capturing opponents piece
-                    if (pieceOnTargetSquare != null)
-                    {
-                        if (pieceOnTargetSquare.IsWhite != boardViewModel.IsWhitesTurn)
-                        {
-                            AttackMap.Add(new Move(startSquare, targetSquare));
-                            break;
-                        }
-                    }
-                    
-                }
+                Knight knight = new();
+                moves = knight.GenerateKnightMove(startingPosition);
             }
+            return moves;
         }
+
+
     }
 }

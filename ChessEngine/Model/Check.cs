@@ -11,9 +11,8 @@ namespace ChessEngine.Model
 {
     public class Check
     {
-        private BoardViewModel boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
 
-        public Piece.Piece isInCheck(List<Move> attackList, int kingPosition)
+        public static Piece.Piece IsInCheck(List<Move> attackList, int kingPosition)
         {
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
             foreach (var attack in attackList)
@@ -26,7 +25,7 @@ namespace ChessEngine.Model
             return null;
         }
 
-        public int getKing(bool isWhite)
+        public static int GetKing(bool isWhite)
         {
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
             foreach (var item in temp.Pieces)
@@ -39,22 +38,22 @@ namespace ChessEngine.Model
             return -1;
         }
 
-        public List<Move> GenerateLegelMoves(int startindex, Piece.Piece piece)
+        public static List<Move> GenerateLegelMoves(int startindex, Piece.Piece piece)
         {
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
             List<Move> pseudoLegealMoves = temp.MoveLogic.GenerateMoveForPiece(piece, startindex);
-            List<Move> legalMoves = new List<Move>();
+            List<Move> legalMoves = new();
 
             foreach (var moveToVerify in pseudoLegealMoves)
             {
                 temp.MoveLogic.MakePseudoMove(moveToVerify);
-                temp.MoveLogic.SwitchTurn();
+                MoveLogic.SwitchTurn();
                 List<Move> opponentResponses = temp.MoveLogic.GenerateMoves();
                 bool resetList = false;
                 List<Move> tempMoves = new();
                 foreach (var item in opponentResponses)
                 {
-                    int kingIndex = getKing(temp.IsWhitesTurn);
+                    int kingIndex = GetKing(temp.IsWhitesTurn);
                     if (item.TargetSquare == kingIndex)
                     {
                         resetList = true;
@@ -75,29 +74,29 @@ namespace ChessEngine.Model
                     legalMoves.Add(moveToVerify);
 
                 }
-                temp.MoveLogic.SwitchTurn();
+                MoveLogic.SwitchTurn();
                 temp.MoveLogic.UnmakeMove(moveToVerify);
             }
             //temp.MoveLogic.recentCaptures = new();
             return legalMoves;
         }
 
-        public List<Move> GenerateAllLegelMoves()
+        public static List<Move> GenerateAllLegelMoves()
         {
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
             List<Move> pseudoLegealMoves = temp.MoveLogic.GenerateMoves();
-            List<Move> legalMoves = new List<Move>();
+            List<Move> legalMoves = new();
 
             foreach (var moveToVerify in pseudoLegealMoves)
             {
                 temp.MoveLogic.MakePseudoMove(moveToVerify);
-                temp.MoveLogic.SwitchTurn();
+                MoveLogic.SwitchTurn();
                 List<Move> opponentResponses = temp.MoveLogic.GenerateMoves();
                 bool resetList = false;
                 List<Move> tempMoves = new();
                 foreach (var item in opponentResponses)
                 {
-                    int kingIndex = getKing(temp.IsWhitesTurn);
+                    int kingIndex = GetKing(temp.IsWhitesTurn);
                     if (item.TargetSquare == kingIndex)
                     {
                         resetList = true;
@@ -118,7 +117,7 @@ namespace ChessEngine.Model
                     legalMoves.Add(moveToVerify);
 
                 }
-                temp.MoveLogic.SwitchTurn();
+                MoveLogic.SwitchTurn();
                 temp.MoveLogic.UnmakeMove(moveToVerify);
             }
             //temp.MoveLogic.recentCaptures = new();

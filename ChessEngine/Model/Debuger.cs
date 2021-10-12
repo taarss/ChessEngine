@@ -81,7 +81,7 @@ namespace ChessEngine.Model
                 boardViewModel.MoveLogic.MakePseudoMove(move);
                 numPositionsBinding++;
                 await Task.Delay(10);
-                boardViewModel.MoveLogic.SwitchTurn();
+                MoveLogic.SwitchTurn();
                 moves = boardViewModel.MoveLogic.GenerateMoves();
                 foreach (var item in moves)
                 {
@@ -92,7 +92,7 @@ namespace ChessEngine.Model
                     await Task.Delay(10);
                 }
                 boardViewModel.MoveLogic.UnmakeMove(move);
-                boardViewModel.MoveLogic.SwitchTurn();
+                MoveLogic.SwitchTurn();
                 await Task.Delay(10);
 
 

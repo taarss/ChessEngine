@@ -81,7 +81,7 @@ namespace ChessEngine.View
             }
         }
 
-        private void selectPiece(object sender, MouseEventArgs e)
+        private void SelectPiece(object sender, MouseEventArgs e)
         {
             moves = new List<Move>();
             Point position = Mouse.GetPosition(myCanvas);
@@ -89,10 +89,8 @@ namespace ChessEngine.View
             selectedPiece = boardViewModel.TheGrid[oldIndex].piece;
             if (selectedPiece.IsWhite == boardViewModel.IsWhitesTurn)
             {
-                boardViewModel.MoveLogic.PrecomputedMoveData();
-                moves = boardViewModel.MoveLogic.check.GenerateLegelMoves(oldIndex, selectedPiece);
+                moves = Check.GenerateLegelMoves(oldIndex, selectedPiece);
                 MarkLegalMoves(moves);
-                boardViewModel.MoveLogic.GenerateAttackMapForAll();
                 MarkAllAttackedSquares(boardViewModel.MoveLogic.AttackMap);
                 isDragging = true;
                 followPiece.Visibility = Visibility.Visible;
@@ -100,7 +98,7 @@ namespace ChessEngine.View
             
         }
 
-        private void placePiece(object sender, MouseButtonEventArgs e)
+        private void PlacePiece(object sender, MouseButtonEventArgs e)
         {
 
             if (selectedPiece != null)
@@ -111,27 +109,14 @@ namespace ChessEngine.View
                 {
                     if (item.TargetSquare == index)
                     {
-                        if (item.isCastleMove)
-                        {
-                            boardViewModel.MoveLogic.MakeMove(new Move(item.StartSquare, item.TargetSquare));
-                            boardViewModel.MoveLogic.MakeMove(new Move(item.CastleStart, item.CastleTarget));
-                        }
-                        else if (item.isEnPassent)
-                        {
-                            boardViewModel.MoveLogic.RemovePieceAtIndex(item.EnPassentIndex);
-                            boardViewModel.MoveLogic.MakeMove(item);
-                        }
-                        else
-                        {
-                            boardViewModel.MoveLogic.MakeMove(item);
-                        }
+                        boardViewModel.MoveLogic.PlacePiece(item);
                         UnmarkLegalMoves();
                         System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chri45n5/source/repos/ChessEngine/ChessEngine/assets/sounds/chess.wav");
                         //System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chris/Source/Repos/Chess/ChessEngine/assets/sounds/chess.wav");
                         player.Play();
                         isDragging = false;
                         followPiece.Visibility = Visibility.Collapsed;
-                        boardViewModel.MoveLogic.SwitchTurn();
+                        MoveLogic.SwitchTurn();
                         break;
                     }
                     boardViewModel.TheGrid[oldIndex].piece = selectedPiece;
@@ -147,7 +132,7 @@ namespace ChessEngine.View
             followPiece.Visibility = Visibility.Collapsed;
         }
 
-        private int CalculateIndexFromPosition(Point point)
+        private static int CalculateIndexFromPosition(Point point)
         {
             int pX = (int)Math.Floor(point.X / 60.0);
             int pY = (int)Math.Floor(point.Y / 60.0);
@@ -159,7 +144,7 @@ namespace ChessEngine.View
         {
             foreach (var item in moves)
             {
-                int[] move = boardViewModel.IndexToCoordinate(item.TargetSquare);
+                int[] move = BoardViewModel.IndexToCoordinate(item.TargetSquare);
                 Rectangle rectangle = myGridOverlay.Children.Cast<Rectangle>().First(e => Grid.GetRow(e) == move[0] && Grid.GetColumn(e) == move[1]);
                 if (item.IsDoublePush)
                 {
@@ -185,7 +170,7 @@ namespace ChessEngine.View
         {
             foreach (var item in attakcs)
             {
-                int[] move = boardViewModel.IndexToCoordinate(item.TargetSquare);
+                int[] move = BoardViewModel.IndexToCoordinate(item.TargetSquare);
                 Rectangle rectangle = myGridOverlay.Children.Cast<Rectangle>().First(e => Grid.GetRow(e) == move[0] && Grid.GetColumn(e) == move[1]);
                 rectangle.Fill = new SolidColorBrush(System.Windows.Media.Colors.Red);
                 rectangle.Opacity = 0.3;

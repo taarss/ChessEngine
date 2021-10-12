@@ -71,7 +71,7 @@ namespace ChessEngine.View
 
             int result = boardViewModel.Ai.SearchMoves(2, Int32.MinValue, Int32.MaxValue);
             boardViewModel.MoveLogic.MakeMove(boardViewModel.Ai.BestMove);
-            boardViewModel.MoveLogic.SwitchTurn();
+            Model.MoveLogic.SwitchTurn();
         }
     }
 }

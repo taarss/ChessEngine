@@ -14,14 +14,14 @@ namespace ChessEngine.Model.Piece
         int[] pushDir; 
         int[] enPassentCheckList;
 
-        Pawn(bool isWhite)
+        public Pawn(bool isWhite)
         {
             dirs = (isWhite) ? new[] { -9, -7 } : new[] { 9, 7 };
             pushDir = (isWhite) ? new[] { -8, -16 } : new[] { 8, 16 };
             enPassentCheckList = new int[] { -1, 1 };
         }
 
-        private List<Move> GeneratePossibleMoves(Piece pawn, int startSquare)
+        public List<Move> GeneratePossibleMoves(Piece pawn, int startSquare)
         {
             BoardViewModel board = (BoardViewModel)App.Current.Resources["boardViewModel"];
             List<Move> moves = new();

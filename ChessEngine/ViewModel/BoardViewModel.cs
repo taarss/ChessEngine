@@ -14,30 +14,24 @@ namespace ChessEngine.ViewModel
 {
     public class BoardViewModel
     {
+
         private bool isWhitesTurn = false;
         private bool playerColor = true;
         private bool movePieceEnabled = false;
         private List<Move> moves;
         public List<Move> AttackMap = new();
         private Piece movePiece = new Piece("Pawn", true);
-        private ObservableCollection<Cell> theGrid = new ObservableCollection<Cell>();
+        private ObservableCollection<Cell> theGrid = new();
         private Dictionary<int, Piece> pieces = new();
         private MoveLogic moveLogic = new();
-        private Coordinate followPieceCoordinates = new Coordinate(100, 100);
-        private Debuger debuger = new();
         private AI ai = new();
+        private Debuger debuger = new();
+        private Coordinate followPieceCoordinates = new Coordinate(100, 100);
 
-        public Piece MovePiece { get => movePiece; set => movePiece = value; }
-        public bool MovePieceEnabled { get => movePieceEnabled; set => movePieceEnabled = value; }
-        public ObservableCollection<Cell> TheGrid { get => theGrid; set => theGrid = value; }
-        public bool IsWhitesTurn { get => isWhitesTurn; set => isWhitesTurn = value; }
-        public List<Move> Moves { get => moves; set => moves = value; }
-        public Coordinate FollowPieceCoordinates { get => followPieceCoordinates; set => followPieceCoordinates = value; }
-        public Debuger Debuger { get => debuger; set => debuger = value; }
-        public MoveLogic MoveLogic { get => moveLogic; set => moveLogic = value; }
-        public Dictionary<int, Piece> Pieces { get => pieces; set => pieces = value; }
-        public bool PlayerColor { get => playerColor; set => playerColor = value; }
-        public AI Ai { get => ai; set => ai = value; }
+
+
+
+
 
         public BoardViewModel()
         {
@@ -47,7 +41,6 @@ namespace ChessEngine.ViewModel
                 theGrid.Add(new Cell(coordinates[0], coordinates[1]));
             }
             LoadDefaultPosition();
-            MoveLogic.PrecomputedMoveData();
         }
 
         private void LoadDefaultPosition()
@@ -107,7 +100,7 @@ namespace ChessEngine.ViewModel
             }
         }
 
-        public int[] IndexToCoordinate(int index)
+        public static int[] IndexToCoordinate(int index)
         {
             int[] result = new int[2];
             int y = (int)MathF.Ceiling(index / 8);
@@ -130,6 +123,17 @@ namespace ChessEngine.ViewModel
             return result;
         }
 
-       
+
+        public Piece MovePiece { get => movePiece; set => movePiece = value; }
+        public bool MovePieceEnabled { get => movePieceEnabled; set => movePieceEnabled = value; }
+        public ObservableCollection<Cell> TheGrid { get => theGrid; set => theGrid = value; }
+        public bool IsWhitesTurn { get => isWhitesTurn; set => isWhitesTurn = value; }
+        public List<Move> Moves { get => moves; set => moves = value; }
+        public Coordinate FollowPieceCoordinates { get => followPieceCoordinates; set => followPieceCoordinates = value; }
+        public Debuger Debuger { get => debuger; set => debuger = value; }
+        public MoveLogic MoveLogic { get => moveLogic; set => moveLogic = value; }
+        public Dictionary<int, Piece> Pieces { get => pieces; set => pieces = value; }
+        public bool PlayerColor { get => playerColor; set => playerColor = value; }
+        public AI Ai { get => ai; set => ai = value; }
     }
 }
