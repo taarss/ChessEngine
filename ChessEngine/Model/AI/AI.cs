@@ -33,7 +33,7 @@ namespace ChessEngine.Model.AI
             {
                 board.MoveLogic.MakePseudoMove(move);
                 int evaluation = -SearchMoves(depth - 1, -beta, -alpha);
-                board.MoveLogic.UnmakeMove(move);
+                board.MoveLogic.UnmakeMove();
                 if (evaluation >= beta)
                 {
                     //Move was too good so the oppenent will avoid this position

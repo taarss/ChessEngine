@@ -75,7 +75,7 @@ namespace ChessEngine.Model
 
                 }
                 MoveLogic.SwitchTurn();
-                temp.MoveLogic.UnmakeMove(moveToVerify);
+                temp.MoveLogic.UnmakeMove();
             }
             //temp.MoveLogic.recentCaptures = new();
             return legalMoves;
@@ -118,7 +118,7 @@ namespace ChessEngine.Model
 
                 }
                 MoveLogic.SwitchTurn();
-                temp.MoveLogic.UnmakeMove(moveToVerify);
+                temp.MoveLogic.UnmakeMove();
             }
             //temp.MoveLogic.recentCaptures = new();
             return legalMoves;

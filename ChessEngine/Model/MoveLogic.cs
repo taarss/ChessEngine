@@ -53,8 +53,14 @@ namespace ChessEngine.Model
             {
                 selectedPiece.HasDoublePushed = true;
             }
-
-            recentMoves.Push(new PreviousMove(new CapturedPiece(move.StartSquare, temp.TheGrid[move.TargetSquare].piece), move));
+            if (temp.TheGrid[move.TargetSquare].piece != null)
+            {
+                recentMoves.Push(new PreviousMove(move, temp.TheGrid[move.TargetSquare].piece));
+            }
+            else
+            {
+                recentMoves.Push(new PreviousMove(move));
+            }
             temp.Pieces.Remove(move.StartSquare);
             temp.Pieces[move.TargetSquare] = selectedPiece;
             temp.TheGrid[move.TargetSquare].piece = selectedPiece;
@@ -65,7 +71,14 @@ namespace ChessEngine.Model
         {
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
             Piece.Piece selectedPiece = temp.TheGrid[move.StartSquare].piece;
-            recentMoves.Push(new PreviousMove(new CapturedPiece(move.StartSquare, temp.TheGrid[move.TargetSquare].piece), move));
+            if (temp.TheGrid[move.TargetSquare].piece != null)
+            {
+                recentMoves.Push(new PreviousMove(move, temp.TheGrid[move.TargetSquare].piece));
+            }
+            else
+            {
+                recentMoves.Push(new PreviousMove(move));
+            }
             temp.Pieces.Remove(move.StartSquare);
             temp.Pieces[move.TargetSquare] = selectedPiece;
             temp.TheGrid[move.TargetSquare].piece = selectedPiece;
@@ -92,21 +105,23 @@ namespace ChessEngine.Model
 
 
 
-        public void UnmakeMove(Move move)
+        public void UnmakeMove()
         {
             if (recentMoves.Count != 0)
             {
                 PreviousMove previousMove = recentMoves.Pop();
-                boardViewModel.Pieces[move.StartSquare] = boardViewModel.Pieces[move.TargetSquare];
-                boardViewModel.Pieces[move.TargetSquare] = previousMove.Value;
-                boardViewModel.TheGrid[move.StartSquare].piece = boardViewModel.TheGrid[move.TargetSquare].piece;
-                boardViewModel.TheGrid[item.Key].piece = item.Value;
-           
+                if (previousMove.CapturedPiece != null)
+                {
+
+                }
+
+                boardViewModel.Pieces[previousMove.Move.StartSquare] = boardViewModel.Pieces[previousMove.Move.TargetSquare];
+                boardViewModel.Pieces[previousMove.Move.TargetSquare] = previousMove.CapturedPiece;
+                boardViewModel.TheGrid[previousMove.Move.StartSquare].piece = boardViewModel.TheGrid[previousMove.Move.TargetSquare].piece;
+                boardViewModel.TheGrid[previousMove.Move.TargetSquare].piece = previousMove.CapturedPiece;
+                
             }
-            else
-            {
-                MakePseudoMove(new Move(move.TargetSquare, move.StartSquare));
-            }
+            
         }
 
         public static void SwitchTurn()

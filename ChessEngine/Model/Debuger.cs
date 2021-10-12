@@ -88,10 +88,10 @@ namespace ChessEngine.Model
                     boardViewModel.MoveLogic.MakePseudoMove(item);
                     numPositionsBinding++;
                     await Task.Delay(10);
-                    boardViewModel.MoveLogic.UnmakeMove(item);
+                    boardViewModel.MoveLogic.UnmakeMove();
                     await Task.Delay(10);
                 }
-                boardViewModel.MoveLogic.UnmakeMove(move);
+                boardViewModel.MoveLogic.UnmakeMove();
                 MoveLogic.SwitchTurn();
                 await Task.Delay(10);
 

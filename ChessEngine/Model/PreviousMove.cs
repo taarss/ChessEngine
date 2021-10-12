@@ -8,16 +8,20 @@ namespace ChessEngine.Model
 {
     public class PreviousMove
     {
-        private CapturedPiece capturedPiece;
+        private Piece.Piece capturedPiece;
         private Move move;
 
-        public PreviousMove(CapturedPiece capturedPiece, Move move)
+        public PreviousMove(Move move)
+        {
+            this.move = move;
+        }
+        public PreviousMove(Move move, Piece.Piece capturedPiece)
         {
             this.capturedPiece = capturedPiece;
             this.move = move;
         }
 
-        public CapturedPiece CapturedPiece { get => capturedPiece; set => capturedPiece = value; }
+        public Piece.Piece CapturedPiece { get => capturedPiece; set => capturedPiece = value; }
         public Move Move { get => move; set => move = value; }
     }
 }
