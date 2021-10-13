@@ -28,12 +28,16 @@ namespace ChessEngine.Model
         public static int GetKing(bool isWhite)
         {
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
-            foreach (var item in temp.Pieces)
+            for (int i = 0; i < temp.TheGrid.Count; i++)
             {
-                if (item.Value.Name == "King" && item.Value.IsWhite != isWhite)
+                if (temp.TheGrid[i].piece != null)
                 {
-                    return item.Key;
+                    if (temp.TheGrid[i].piece.Name == "King" && temp.TheGrid[i].piece.IsWhite != isWhite)
+                    {
+                        return i;
+                    }
                 }
+                
             }
             return -1;
         }
@@ -43,7 +47,7 @@ namespace ChessEngine.Model
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
             List<Move> pseudoLegealMoves = temp.MoveLogic.GenerateMoveForPiece(piece, startindex);
             List<Move> legalMoves = new();
-
+            temp.AttackMap = new();
             foreach (var moveToVerify in pseudoLegealMoves)
             {
                 temp.MoveLogic.MakePseudoMove(moveToVerify);
@@ -86,7 +90,7 @@ namespace ChessEngine.Model
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
             List<Move> pseudoLegealMoves = temp.MoveLogic.GenerateMoves();
             List<Move> legalMoves = new();
-
+            /*
             foreach (var moveToVerify in pseudoLegealMoves)
             {
                 temp.MoveLogic.MakePseudoMove(moveToVerify);
@@ -121,7 +125,8 @@ namespace ChessEngine.Model
                 temp.MoveLogic.UnmakeMove();
             }
             //temp.MoveLogic.recentCaptures = new();
-            return legalMoves;
+            return legalMoves;*/
+            return pseudoLegealMoves;
         }
 
     }

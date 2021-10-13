@@ -13,9 +13,10 @@ namespace ChessEngine.Model
         public static readonly int[] DirectionOffsets = { 8, -8, -1, 1, 7, -7, 9, -9 };
         public int[][] NumSquaresToEdge = new int[64][];
         private BoardViewModel boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
-        public List<Move> AttackMap = new();
         public Check check = new();
         public Stack<PreviousMove> recentMoves = new();
+
+
         //public Dictionary<int, Piece.Piece> recentCaptures = new();
 
         public List<Move> GenerateMoves()
@@ -23,24 +24,24 @@ namespace ChessEngine.Model
             //Generates all moves possible for whoevers turn it is
             boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
             List<Move> moves = new();
-
+            
             //Loop through each square
             for (int startSquare = 0; startSquare < 64; startSquare++)
             {
                 //if there is a piece on the square
                 if (boardViewModel.TheGrid[startSquare].piece != null)
-                {
-                    //Get the piece
-                    Piece.Piece piece = boardViewModel.TheGrid[startSquare].piece;
-
+                {                   
                     //Check if it matches color of whoevers turn it is
-                    if (piece.IsWhite == boardViewModel.IsWhitesTurn)
+                    if (boardViewModel.TheGrid[startSquare].piece.IsWhite == boardViewModel.IsWhitesTurn)
                     {
-                        moves = GenerateMovesBoilerPlate(piece, startSquare);
+                        moves.AddRange(GenerateMovesBoilerPlate(boardViewModel.TheGrid[startSquare].piece, startSquare));
                     }
                 }
 
             }
+            
+
+
             return moves;
         }
 
@@ -48,11 +49,10 @@ namespace ChessEngine.Model
         {
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
             Piece.Piece selectedPiece = temp.TheGrid[move.StartSquare].piece;
-            selectedPiece.HasMoved = true;
-            if (move.IsDoublePush)
-            {
+            selectedPiece.HasMoved = true;           
+            if (move.IsDoublePush)            
                 selectedPiece.HasDoublePushed = true;
-            }
+            
             if (temp.TheGrid[move.TargetSquare].piece != null)
             {
                 recentMoves.Push(new PreviousMove(move, temp.TheGrid[move.TargetSquare].piece));
@@ -61,8 +61,7 @@ namespace ChessEngine.Model
             {
                 recentMoves.Push(new PreviousMove(move));
             }
-            temp.Pieces.Remove(move.StartSquare);
-            temp.Pieces[move.TargetSquare] = selectedPiece;
+
             temp.TheGrid[move.TargetSquare].piece = selectedPiece;
             temp.TheGrid[move.StartSquare].piece = null;
             temp.Debuger.RecordMove(move.StartSquare, move.TargetSquare, selectedPiece);          
@@ -79,10 +78,9 @@ namespace ChessEngine.Model
             {
                 recentMoves.Push(new PreviousMove(move));
             }
-            temp.Pieces.Remove(move.StartSquare);
-            temp.Pieces[move.TargetSquare] = selectedPiece;
             temp.TheGrid[move.TargetSquare].piece = selectedPiece;
             temp.TheGrid[move.StartSquare].piece = null;
+            temp.Debuger.RecordMove(move.StartSquare, move.TargetSquare, selectedPiece);
         }
         public void PlacePiece(Move move)
         {
@@ -115,8 +113,7 @@ namespace ChessEngine.Model
 
                 }
 
-                boardViewModel.Pieces[previousMove.Move.StartSquare] = boardViewModel.Pieces[previousMove.Move.TargetSquare];
-                boardViewModel.Pieces[previousMove.Move.TargetSquare] = previousMove.CapturedPiece;
+                
                 boardViewModel.TheGrid[previousMove.Move.StartSquare].piece = boardViewModel.TheGrid[previousMove.Move.TargetSquare].piece;
                 boardViewModel.TheGrid[previousMove.Move.TargetSquare].piece = previousMove.CapturedPiece;
                 

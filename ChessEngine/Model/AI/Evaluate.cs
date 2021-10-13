@@ -38,5 +38,24 @@ namespace ChessEngine.Model.AI
             material += board.GetAllTypePieces(new Piece.Piece("Queen", isWhite)).Count * queenValue;
             return material;
         }
+
+        public int GetPieceValue(Piece.Piece piece)
+        {
+            switch (piece.Name)
+            {
+                case "Knight":
+                    return knightValue;
+                case "Bishop":
+                    return bishopValue;
+                case "Pawn":
+                    return pawnValue;
+                case "Rook":
+                    return rookValue;
+                case "Queen":
+                    return queenValue;
+                default:
+                    return -1;
+            }
+        }
     }
 }

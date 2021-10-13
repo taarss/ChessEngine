@@ -15,14 +15,13 @@ namespace ChessEngine.ViewModel
     public class BoardViewModel
     {
 
-        private bool isWhitesTurn = false;
+        private bool isWhitesTurn = true;
         private bool playerColor = true;
         private bool movePieceEnabled = false;
         private List<Move> moves;
         public List<Move> AttackMap = new();
         private Piece movePiece = new Piece("Pawn", true);
         private ObservableCollection<Cell> theGrid = new();
-        private Dictionary<int, Piece> pieces = new();
         private MoveLogic moveLogic = new();
         private AI ai = new();
         private Debuger debuger = new();
@@ -46,10 +45,13 @@ namespace ChessEngine.ViewModel
         private void LoadDefaultPosition()
         {
             //Normal start position
-            FENLoader("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
-
+            FENLoader("r3k2r/p1ppqpb1/Bn2pnp1/3PN3/1p2P3/2N2Q2/PPPB1PpP/R3Q2R");
+            //Normal start position
+            //FENLoader("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
             //Knight debug fen string
             //FENLoader("1n4n1/8/8/8/8/8/8/1N4N1");
+
+
 
             //Debug pieces debug
             //FENLoader("8/p3k3/8/6P1/8/8/8/8");
@@ -92,7 +94,6 @@ namespace ChessEngine.ViewModel
                     Piece result = new Piece(pieceTypeFromSymbol[Char.ToLower(item)], char.IsUpper(item));
                     int[] coordinate = IndexToCoordinate(index);
                     Cell cell = new Cell(coordinate[0], coordinate[1]);
-                    pieces[index] = result;
                     cell.piece = result;
                     TheGrid[index] = cell;
                     index++;
@@ -113,12 +114,16 @@ namespace ChessEngine.ViewModel
         public List<Piece> GetAllTypePieces(Piece piece)
         {
             List<Piece> result = new();
-            foreach (var item in pieces)
+
+            foreach (var item in theGrid)
             {
-                if (item.Value.Name == piece.Name && item.Value.IsWhite == piece.IsWhite)
+                if (item.piece != null)
                 {
-                    result.Add(item.Value);
-                }
+                    if (item.piece.Name == piece.Name && item.piece.IsWhite == piece.IsWhite)
+                    {
+                        result.Add(item.piece);
+                    }
+                }               
             }
             return result;
         }
@@ -132,7 +137,6 @@ namespace ChessEngine.ViewModel
         public Coordinate FollowPieceCoordinates { get => followPieceCoordinates; set => followPieceCoordinates = value; }
         public Debuger Debuger { get => debuger; set => debuger = value; }
         public MoveLogic MoveLogic { get => moveLogic; set => moveLogic = value; }
-        public Dictionary<int, Piece> Pieces { get => pieces; set => pieces = value; }
         public bool PlayerColor { get => playerColor; set => playerColor = value; }
         public AI Ai { get => ai; set => ai = value; }
     }

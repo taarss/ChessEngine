@@ -68,9 +68,8 @@ namespace ChessEngine.View
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             testResults.Children.Clear();
-
-            int result = boardViewModel.Ai.SearchMoves(2, Int32.MinValue, Int32.MaxValue);
-            boardViewModel.MoveLogic.MakeMove(boardViewModel.Ai.BestMove);
+            boardViewModel.Ai.StartSearch();
+            boardViewModel.MoveLogic.MakeMove(boardViewModel.Ai.GetSearchResult().move);
             Model.MoveLogic.SwitchTurn();
         }
     }

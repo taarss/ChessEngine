@@ -91,7 +91,7 @@ namespace ChessEngine.View
             {
                 moves = Check.GenerateLegelMoves(oldIndex, selectedPiece);
                 MarkLegalMoves(moves);
-                MarkAllAttackedSquares(boardViewModel.MoveLogic.AttackMap);
+                MarkAllAttackedSquares(boardViewModel.AttackMap);
                 isDragging = true;
                 followPiece.Visibility = Visibility.Visible;
             }
@@ -125,8 +125,7 @@ namespace ChessEngine.View
                 {
                     boardViewModel.TheGrid[oldIndex].piece = selectedPiece;
                 }
-                boardViewModel.MoveLogic.AttackMap = new();
-                MarkAllAttackedSquares(boardViewModel.MoveLogic.AttackMap);
+                MarkAllAttackedSquares(boardViewModel.AttackMap);
             }
             isDragging = false;
             followPiece.Visibility = Visibility.Collapsed;

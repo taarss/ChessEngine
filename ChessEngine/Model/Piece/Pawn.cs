@@ -27,7 +27,7 @@ namespace ChessEngine.Model.Piece
             List<Move> moves = new();
 
             //Check if the pawn has moved if not add double push as a possible move
-            if (startSquare + pushDir[1] <= 64 && !pawn.HasMoved && board.TheGrid[startSquare + pushDir[1]].piece == null)
+            if (startSquare + pushDir[1] < 64 && !pawn.HasMoved && board.TheGrid[startSquare + pushDir[1]].piece == null)
             {
                 moves.Add(new Move(startSquare, startSquare + pushDir[1], true));
             }
@@ -46,7 +46,7 @@ namespace ChessEngine.Model.Piece
             foreach (var item in enPassentCheckList)
             {
                 //Check if there is a piece on either side of the pawn
-                if (startSquare + item >= 0 && board.TheGrid[startSquare + item].piece != null)
+                if (startSquare + item >= 0 && startSquare + item > 64 && board.TheGrid[startSquare + item].piece != null)
                 {
                     //Check if the piece is friendly or hostile
                     if (board.TheGrid[startSquare + item].piece.IsWhite != board.IsWhitesTurn)
@@ -90,7 +90,7 @@ namespace ChessEngine.Model.Piece
                     //The pawn is not on either of the edges
                     foreach (var item in dirs)
                     {
-                        if (board.TheGrid[startSquare + item].piece != null && board.TheGrid[startSquare + item].piece.IsWhite != pawn.IsWhite)
+                        if (startSquare + item < 64 && startSquare + item > 0 &&  board.TheGrid[startSquare + item].piece != null && board.TheGrid[startSquare + item].piece.IsWhite != pawn.IsWhite)
                         {
                             moves.Add(new Move(startSquare, startSquare + item));
                             board.AttackMap.Add(new Move(startSquare, startSquare + item));
