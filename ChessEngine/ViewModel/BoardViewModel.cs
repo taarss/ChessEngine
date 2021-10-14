@@ -44,10 +44,10 @@ namespace ChessEngine.ViewModel
 
         private void LoadDefaultPosition()
         {
+            //Test 2 start position
+            //FENLoader("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R");
             //Normal start position
-            FENLoader("r3k2r/p1ppqpb1/Bn2pnp1/3PN3/1p2P3/2N2Q2/PPPB1PpP/R3Q2R");
-            //Normal start position
-            //FENLoader("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+            FENLoader("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
             //Knight debug fen string
             //FENLoader("1n4n1/8/8/8/8/8/8/1N4N1");
 

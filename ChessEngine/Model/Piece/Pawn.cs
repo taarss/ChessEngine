@@ -27,7 +27,7 @@ namespace ChessEngine.Model.Piece
             List<Move> moves = new();
 
             //Check if the pawn has moved if not add double push as a possible move
-            if (startSquare + pushDir[1] < 64 && !pawn.HasMoved && board.TheGrid[startSquare + pushDir[1]].piece == null)
+            if (startSquare + pushDir[1] < 64 && startSquare + pushDir[1] > 0 && !pawn.HasMoved && board.TheGrid[startSquare + pushDir[1]].piece == null)
             {
                 moves.Add(new Move(startSquare, startSquare + pushDir[1], true));
             }

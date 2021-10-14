@@ -13,11 +13,18 @@ namespace ChessEngine.Model
         public static readonly int[] DirectionOffsets = { 8, -8, -1, 1, 7, -7, 9, -9 };
         public int[][] NumSquaresToEdge = new int[64][];
         private BoardViewModel boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
+        private BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
         public Check check = new();
         public Stack<PreviousMove> recentMoves = new();
 
 
         //public Dictionary<int, Piece.Piece> recentCaptures = new();
+
+        public void SetViewModel()
+        {
+            temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
+        }
+
 
         public List<Move> GenerateMoves()
         {
@@ -47,7 +54,6 @@ namespace ChessEngine.Model
 
         public void MakeMove(Move move)
         {
-            BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
             Piece.Piece selectedPiece = temp.TheGrid[move.StartSquare].piece;
             selectedPiece.HasMoved = true;           
             if (move.IsDoublePush)            
@@ -66,21 +72,26 @@ namespace ChessEngine.Model
             temp.TheGrid[move.StartSquare].piece = null;
             temp.Debuger.RecordMove(move.StartSquare, move.TargetSquare, selectedPiece);          
         }
-        public void MakePseudoMove(Move move)
+        public bool MakePseudoMove(Move move)
         {
-            BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
             Piece.Piece selectedPiece = temp.TheGrid[move.StartSquare].piece;
             if (temp.TheGrid[move.TargetSquare].piece != null)
             {
                 recentMoves.Push(new PreviousMove(move, temp.TheGrid[move.TargetSquare].piece));
+                temp.TheGrid[move.TargetSquare].piece = selectedPiece;
+                temp.TheGrid[move.StartSquare].piece = null;
+                //temp.Debuger.RecordMove(move.StartSquare, move.TargetSquare, selectedPiece);
+                return true;
             }
             else
             {
                 recentMoves.Push(new PreviousMove(move));
+                temp.TheGrid[move.TargetSquare].piece = selectedPiece;
+                temp.TheGrid[move.StartSquare].piece = null;
+                //temp.Debuger.RecordMove(move.StartSquare, move.TargetSquare, selectedPiece);
+                return false;
             }
-            temp.TheGrid[move.TargetSquare].piece = selectedPiece;
-            temp.TheGrid[move.StartSquare].piece = null;
-            temp.Debuger.RecordMove(move.StartSquare, move.TargetSquare, selectedPiece);
+            
         }
         public void PlacePiece(Move move)
         {

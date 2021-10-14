@@ -69,7 +69,6 @@ namespace ChessEngine.View
         {
             testResults.Children.Clear();
             boardViewModel.Ai.StartSearch();
-            boardViewModel.MoveLogic.MakeMove(boardViewModel.Ai.GetSearchResult().move);
             Model.MoveLogic.SwitchTurn();
         }
     }
