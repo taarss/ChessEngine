@@ -47,19 +47,19 @@ namespace ChessEngine.Model.AI
 			board = (BoardViewModel)App.Current.Resources["boardViewModel"];
 			board.MoveLogic.SetViewModel();
 			searchStopwatch.Start();
-			SearchMoves(4, 0, negativeInfinity, positiveInfinity);
+			SearchMoves(6, 0, negativeInfinity, positiveInfinity);
 			//SearchMoves(5, 0, negativeInfinity, positiveInfinity);
 			searchStopwatch.Stop();
             Console.WriteLine(searchStopwatch.ElapsedMilliseconds);
 			bestMove = bestMoveThisIteration;
 			bestEval = bestEvalThisIteration;
-			
-
+			board.MoveLogic.temp = board;
+			board.MoveLogic.MakeMove(GetSearchResult());
 		}
 
-		public (Move move, int eval) GetSearchResult()
+		public Move GetSearchResult()
 		{
-			return (bestMove, bestEval);
+			return bestMove;
 		}
 
 		public void EndSearch()
@@ -121,16 +121,17 @@ namespace ChessEngine.Model.AI
 				board.MoveLogic.UnmakeMove();
 				numNodes++;
 
-                // Move was *too* good, so opponent won't allow this position to be reached
-                // (by choosing a different move earlier on). Skip remaining moves.
-                if (isCaptureMove)
-                {
-					if (eval >= beta)
+				// Move was *too* good, so opponent won't allow this position to be reached
+				// (by choosing a different move earlier on). Skip remaining moves.
+				
+					
+				if (isCaptureMove)
+				{
+					if (eval > beta)
 					{
 						numCutoffs++;
 						return beta;
 					}
-
 					// Found a new best move in this position
 					if (eval > alpha)
 					{
@@ -144,6 +145,8 @@ namespace ChessEngine.Model.AI
 						}
 					}
 				}
+					
+				
 				
 			}
 			return alpha;

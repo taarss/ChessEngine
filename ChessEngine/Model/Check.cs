@@ -48,8 +48,11 @@ namespace ChessEngine.Model
             List<Move> pseudoLegealMoves = temp.MoveLogic.GenerateMoveForPiece(piece, startindex);
             List<Move> legalMoves = new();
             temp.AttackMap = new();
+            temp.MoveLogic.temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
+
             foreach (var moveToVerify in pseudoLegealMoves)
             {
+                temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
                 temp.MoveLogic.MakePseudoMove(moveToVerify);
                 MoveLogic.SwitchTurn();
                 List<Move> opponentResponses = temp.MoveLogic.GenerateMoves();

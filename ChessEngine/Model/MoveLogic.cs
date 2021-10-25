@@ -13,7 +13,7 @@ namespace ChessEngine.Model
         public static readonly int[] DirectionOffsets = { 8, -8, -1, 1, 7, -7, 9, -9 };
         public int[][] NumSquaresToEdge = new int[64][];
         private BoardViewModel boardViewModel = (BoardViewModel)App.Current.Resources["boardViewModel"];
-        private BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
+        public BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
         public Check check = new();
         public Stack<PreviousMove> recentMoves = new();
 
@@ -72,9 +72,12 @@ namespace ChessEngine.Model
             temp.TheGrid[move.StartSquare].piece = null;
             temp.Debuger.RecordMove(move.StartSquare, move.TargetSquare, selectedPiece);          
         }
+
+
         public bool MakePseudoMove(Move move)
         {
             Piece.Piece selectedPiece = temp.TheGrid[move.StartSquare].piece;
+            selectedPiece.HasMoved = true;
             if (temp.TheGrid[move.TargetSquare].piece != null)
             {
                 recentMoves.Push(new PreviousMove(move, temp.TheGrid[move.TargetSquare].piece));
