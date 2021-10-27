@@ -105,7 +105,9 @@ namespace ChessEngine.Model.AI
 			}
 
 			//List<Move> moves = Check.GenerateAllLegelMoves();
+			board.AttackMap = new();
 			List<Move> moves = board.MoveLogic.GenerateMoves();
+
 			moves = moveOrder.OrderMoves(moves);
 			// Detect checkmate and stalemate when no legal moves are available
 			if (moves.Count == 0)

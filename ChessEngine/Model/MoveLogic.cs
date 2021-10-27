@@ -138,6 +138,7 @@ namespace ChessEngine.Model
         public static void SwitchTurn()
         {
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
+            temp.AttackMap = new();
             temp.IsWhitesTurn = !temp.IsWhitesTurn;
         }
 
