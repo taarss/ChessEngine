@@ -24,10 +24,10 @@ namespace ChessEngine.ViewModel
         private Piece movePiece = new Piece("Pawn", true);
         private ObservableCollection<Cell> theGrid = new();
         private MoveLogic moveLogic = new();
-        private AI ai = new();
         private Debuger debuger = new();
         private Coordinate followPieceCoordinates = new Coordinate(100, 100);
-        BitBoard bitBoard = new();
+        public BitBoard bitBoard = new();
+
 
 
 
@@ -43,8 +43,6 @@ namespace ChessEngine.ViewModel
             }
            // LoadDefaultPosition();
             bitBoard.LoadStartPosition();
-            UpdateGUI();
-            bitBoard.MakeMove(new BitMove(0, 30));
             UpdateGUI();
 
         }
@@ -154,6 +152,5 @@ namespace ChessEngine.ViewModel
         public Debuger Debuger { get => debuger; set => debuger = value; }
         public MoveLogic MoveLogic { get => moveLogic; set => moveLogic = value; }
         public bool PlayerColor { get => playerColor; set => playerColor = value; }
-        public AI Ai { get => ai; set => ai = value; }
     }
 }

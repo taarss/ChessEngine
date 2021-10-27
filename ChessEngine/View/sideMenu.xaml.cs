@@ -15,6 +15,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ChessEngine.Model.AI;
+using ChessEngine.Model.BitBoard;
+using ChessEngine.Model.BitBoard.BinaryMoveGen;
 
 namespace ChessEngine.View
 {
@@ -68,8 +70,9 @@ namespace ChessEngine.View
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             testResults.Children.Clear();
-            //boardViewModel.Ai.StartSearch();
-            //Model.MoveLogic.SwitchTurn();
+            AI ai = new(boardViewModel.bitBoard);
+            ai.StartSearch();
+            boardViewModel.UpdateGUI();
         }
     }
 }

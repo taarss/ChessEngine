@@ -73,12 +73,25 @@ namespace ChessEngine.Model.BitBoard
 				return flag == Flag.PromoteToQueen || flag == Flag.PromoteToRook || flag == Flag.PromoteToKnight || flag == Flag.PromoteToBishop;
 			}
 		}
-
+		public static BitMove InvalidMove
+		{
+			get
+			{
+				return new BitMove(0);
+			}
+		}
 		public int MoveFlag
 		{
 			get
 			{
 				return moveValue >> 12;
+			}
+		}
+		public string Name
+		{
+			get
+			{
+				return BoardRepresentation.SquareNameFromIndex(StartSquare) + "-" + BoardRepresentation.SquareNameFromIndex(TargetSquare);
 			}
 		}
 

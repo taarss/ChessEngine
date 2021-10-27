@@ -3,94 +3,77 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ChessEngine.Model;
 using ChessEngine.ViewModel;
-
+using ChessEngine.Model.BitBoard;
+using ChessEngine.Model.BitBoard.BinaryMoveGen;
 namespace ChessEngine.Model.AI
 {
     public class AI
     {
+		const int transpositionTableSize = 64000;
 		const int immediateMateScore = 100000;
 		const int positiveInfinity = 9999999;
 		const int negativeInfinity = -positiveInfinity;
 
-		Move bestMoveThisIteration;
+		public event System.Action<Move> onSearchComplete;
+
+		PseudoLegalMoveGenerator moveGenerator;
+
+		BitMove bestMoveThisIteration;
 		int bestEvalThisIteration;
-		Move bestMove;
+		BitMove bestMove;
 		int bestEval;
+		int currentIterativeSearchDepth;
 		bool abortSearch;
 
-		Move invalidMove;
-		BoardViewModel board = (BoardViewModel)App.Current.Resources["boardViewModel"];
-		Evaluate evaluate = new();
+		BitMove invalidMove;
+		BitBoard.BitBoard board;
+		Evaluate evaluation;
 
 		// Diagnostics
 		int numNodes;
 		int numQNodes;
 		int numCutoffs;
 		int numTranspositions;
-		int numPositionsEvaluated = 0;
-		System.Diagnostics.Stopwatch searchStopwatch = new();
-		MoveOrder moveOrder = new();
+		System.Diagnostics.Stopwatch searchStopwatch;
+
+		public AI(BitBoard.BitBoard board)
+		{
+			this.board = board;
+			evaluation = new Evaluate();
+			moveGenerator = new PseudoLegalMoveGenerator();
+			invalidMove = BitMove.InvalidMove;
+		}
 
 		public void StartSearch()
 		{
 
 			// Initialize search settings
 			bestEvalThisIteration = bestEval = 0;
+			bestMoveThisIteration = bestMove = BitMove.InvalidMove;
+
+		
 
 			abortSearch = false;
 
 			// Iterative deepening. This means doing a full search with a depth of 1, then with a depth of 2, and so on.
 			// This allows the search to be aborted at any time, while still yielding a useful result from the last search.
-
-			board = (BoardViewModel)App.Current.Resources["boardViewModel"];
-			board.MoveLogic.SetViewModel();
-			searchStopwatch.Start();
-			SearchMoves(6, 0, negativeInfinity, positiveInfinity);
-			//SearchMoves(5, 0, negativeInfinity, positiveInfinity);
-			searchStopwatch.Stop();
-            Console.WriteLine(searchStopwatch.ElapsedMilliseconds);
+			
+			
+			SearchMoves(3, 0, negativeInfinity, positiveInfinity);
 			bestMove = bestMoveThisIteration;
-			bestEval = bestEvalThisIteration;
-			board.MoveLogic.temp = board;
-			board.MoveLogic.MakeMove(GetSearchResult());
+			bestEval = bestEvalThisIteration;		
 		}
 
-		public Move GetSearchResult()
+		public (BitMove move, int eval) GetSearchResult()
 		{
-			return bestMove;
+			return (bestMove, bestEval);
 		}
 
 		public void EndSearch()
 		{
 			abortSearch = true;
 		}
-
-		int Search(int depth)
-        {
-            if (depth == 0)
-            {
-				return Evaluate.EvaluateMaterial();
-            }
-			List<Move> moves = board.MoveLogic.GenerateMoves();
-            if (moves.Count == 0)
-            {
-				return negativeInfinity;
-            }
-			int bestEvaluation = negativeInfinity;
-            foreach (var item in moves)
-            {
-				numNodes++;
-				board.MoveLogic.MakeMove(item);
-				int evaluation = -Search(depth - 1);
-				bestEvaluation = Math.Max(evaluation, bestEvaluation);
-				board.MoveLogic.UnmakeMove();
-            }
-			return bestEvaluation;
-        }
-
-
 
 		int SearchMoves(int depth, int plyFromRoot, int alpha, int beta)
 		{
@@ -99,62 +82,117 @@ namespace ChessEngine.Model.AI
 				return 0;
 			}
 
+			if (plyFromRoot > 0)
+			{
+				// Skip this position if a mating sequence has already been found earlier in
+				// the search, which would be shorter than any mate we could find from here.
+				// This is done by observing that alpha can't possibly be worse (and likewise
+				// beta can't  possibly be better) than being mated in the current position.
+				alpha = Math.Max(alpha, -immediateMateScore + plyFromRoot);
+				beta = Math.Min(beta, immediateMateScore - plyFromRoot);
+				if (alpha >= beta)
+				{
+					return alpha;
+				}
+			}
+
+				
 			if (depth == 0)
 			{
-				return Evaluate.EvaluateMaterial();
+				int evaluation = QuiescenceSearch(alpha, beta);
+				return evaluation;
 			}
 
-			//List<Move> moves = Check.GenerateAllLegelMoves();
-			List<Move> moves = board.MoveLogic.GenerateMoves();
-			moves = moveOrder.OrderMoves(moves);
+			List<BitMove> moves = moveGenerator.GenerateMoves(board);
 			// Detect checkmate and stalemate when no legal moves are available
 			if (moves.Count == 0)
-			{			
-				return -negativeInfinity;
+			{
+				return 0;
+				
 			}
+			BitMove bestMoveInThisPosition = invalidMove;
 
-			Move bestMoveInThisPosition = invalidMove;
 			for (int i = 0; i < moves.Count; i++)
 			{
-				bool isCaptureMove = board.MoveLogic.MakePseudoMove(moves[i]);
+				board.MakeMove(moves[i], inSearch: true);
 				int eval = -SearchMoves(depth - 1, plyFromRoot + 1, -beta, -alpha);
-				board.MoveLogic.UnmakeMove();
+				board.UnmakeMove(moves[i], inSearch: true);
 				numNodes++;
 
 				// Move was *too* good, so opponent won't allow this position to be reached
 				// (by choosing a different move earlier on). Skip remaining moves.
-				
-					
-				if (isCaptureMove)
+				if (eval >= beta)
 				{
-					if (eval > beta)
-					{
-						numCutoffs++;
-						return beta;
-					}
-					// Found a new best move in this position
-					if (eval > alpha)
-					{
-						bestMoveInThisPosition = moves[i];
+					
+					numCutoffs++;
+					return beta;
+				}
 
-						alpha = eval;
-						if (plyFromRoot == 0)
-						{
-							bestMoveThisIteration = moves[i];
-							bestEvalThisIteration = eval;
-						}
+				// Found a new best move in this position
+				if (eval > alpha)
+				{
+					bestMoveInThisPosition = moves[i];
+
+					alpha = eval;
+					if (plyFromRoot == 0)
+					{
+						bestMoveThisIteration = moves[i];
+						bestEvalThisIteration = eval;
 					}
 				}
-					
-				
-				
 			}
 			return alpha;
+
 		}
-		
 
+		// Search capture moves until a 'quiet' position is reached.
+		int QuiescenceSearch(int alpha, int beta)
+		{
+			// A player isn't forced to make a capture (typically), so see what the evaluation is without capturing anything.
+			// This prevents situations where a player ony has bad captures available from being evaluated as bad,
+			// when the player might have good non-capture moves available.
+			int eval = evaluation.EvaluateBoard(board);
+			if (eval >= beta)
+			{
+				return beta;
+			}
+			if (eval > alpha)
+			{
+				alpha = eval;
+			}
 
+			var moves = moveGenerator.GenerateMoves(board);
+			for (int i = 0; i < moves.Count; i++)
+			{
+				board.MakeMove(moves[i], true);
+				eval = -QuiescenceSearch(-beta, -alpha);
+				board.UnmakeMove(moves[i], true);
+				numQNodes++;
 
+				if (eval >= beta)
+				{
+					numCutoffs++;
+					return beta;
+				}
+				if (eval > alpha)
+				{
+					alpha = eval;
+				}
+			}
 
+			return alpha;
+		}
+
+		public static bool IsMateScore(int score)
+		{
+			const int maxMateDepth = 1000;
+			return System.Math.Abs(score) > immediateMateScore - maxMateDepth;
+		}
+
+		public static int NumPlyToMateFromScore(int score)
+		{
+			return immediateMateScore - System.Math.Abs(score);
+
+		}
 	}
 }

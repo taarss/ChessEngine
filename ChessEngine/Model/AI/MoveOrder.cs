@@ -21,34 +21,7 @@ namespace ChessEngine.Model.AI
         }
 
 
-        public List<Move> OrderMoves(List<Move> moves)
-        {
-            BoardViewModel board = (BoardViewModel)App.Current.Resources["boardViewModel"];
-            for (int i = 0; i < moves.Count; i++)
-            {
-                int score = 0;
-                Piece.Piece movePieceType = board.TheGrid[moves[i].StartSquare].piece;
-                Piece.Piece capturePieceType = board.TheGrid[moves[i].TargetSquare].piece;
-
-                //Favor capturing opponents most valuable pieces with our least valuable pieces
-                if (capturePieceType != null)
-                {
-                    score = 10 * evaluation.GetPieceValue(capturePieceType) - evaluation.GetPieceValue(movePieceType);
-                }
-
-                foreach (var attackedSquare in board.AttackMap)
-                {
-                    if (attackedSquare.TargetSquare == moves[i].TargetSquare)
-                    {
-                        score -= evaluation.GetPieceValue(movePieceType);
-                        break;
-                    }
-                }
-                moveScores[i] = score;
-            }            
-            return Sort(moves);
-            
-        }
+        
 
         List<Move> Sort(List<Move> moves)
         {
