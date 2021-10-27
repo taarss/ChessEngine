@@ -9,6 +9,7 @@ using System.Windows.Media.Imaging;
 using ChessEngine.Model;
 using ChessEngine.Model.Piece;
 using ChessEngine.Model.AI;
+using ChessEngine.Model.BitBoard;
 
 namespace ChessEngine.ViewModel
 {
@@ -26,6 +27,7 @@ namespace ChessEngine.ViewModel
         private AI ai = new();
         private Debuger debuger = new();
         private Coordinate followPieceCoordinates = new Coordinate(100, 100);
+        BitBoard bitBoard = new();
 
 
 
@@ -39,7 +41,21 @@ namespace ChessEngine.ViewModel
                 int[] coordinates = IndexToCoordinate(i);
                 theGrid.Add(new Cell(coordinates[0], coordinates[1]));
             }
-            LoadDefaultPosition();
+           // LoadDefaultPosition();
+            bitBoard.LoadStartPosition();
+            UpdateGUI();
+            bitBoard.MakeMove(new BitMove(0, 30));
+            UpdateGUI();
+
+        }
+
+        public void UpdateGUI()
+        {
+            Piece[] pieces = BoardRepresentation.TranslateBitBoardToUI(bitBoard);
+            for (int i = 0; i < pieces.Length; i++)
+            {
+                theGrid[i].piece = pieces[i];
+            }
         }
 
         private void LoadDefaultPosition()

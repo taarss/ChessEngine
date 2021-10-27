@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ChessEngine.Model.BitBoard;
 
 namespace ChessEngine.Model.BitBoard
 {
@@ -37,5 +38,49 @@ namespace ChessEngine.Model.BitBoard
         {
 			this.moveValue = moveValue;
         }
+		//The | is a binary OR, which means the computer will combine the bits from two numbers.
+		public BitMove(int startSquare, int targetSquare)
+		{
+			moveValue = (ushort)(startSquare | targetSquare << 6);
+		}
+
+		public BitMove(int startSquare, int targetSquare, int flag)
+		{
+			moveValue = (ushort)(startSquare | targetSquare << 6 | flag << 12);
+		}
+
+		public int StartSquare
+		{
+			get
+			{
+				return moveValue & startSquareMask;
+			}
+		}
+
+		public int TargetSquare
+		{
+			get
+			{
+				return (moveValue & targetSquareMask) >> 6;
+			}
+		}
+
+		public bool IsPromotion
+		{
+			get
+			{
+				int flag = MoveFlag;
+				return flag == Flag.PromoteToQueen || flag == Flag.PromoteToRook || flag == Flag.PromoteToKnight || flag == Flag.PromoteToBishop;
+			}
+		}
+
+		public int MoveFlag
+		{
+			get
+			{
+				return moveValue >> 12;
+			}
+		}
+
 	}
 }

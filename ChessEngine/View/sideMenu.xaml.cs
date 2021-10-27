@@ -68,8 +68,8 @@ namespace ChessEngine.View
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             testResults.Children.Clear();
-            boardViewModel.Ai.StartSearch();
-            Model.MoveLogic.SwitchTurn();
+            //boardViewModel.Ai.StartSearch();
+            //Model.MoveLogic.SwitchTurn();
         }
     }
 }

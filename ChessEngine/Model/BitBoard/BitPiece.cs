@@ -18,6 +18,11 @@ namespace ChessEngine.Model.BitBoard
 
         public const int White = 8;
         public const int Black = 16;
+
+        const int typeMask = 0b00111;
+        const int blackMask = 0b10000;
+        const int whiteMask = 0b01000;
+        const int colourMask = whiteMask | blackMask;
         /*
         color   type
         00   -   000
@@ -50,12 +55,35 @@ namespace ChessEngine.Model.BitBoard
         white   rook
         01   -  101
         white   queen
-        01   -  111
-
-
-
-         
-         
+        01   -  111            
          */
+        public static bool IsColour(int piece, int colour)
+        {
+            return (piece & colourMask) == colour;
+        }
+
+        public static int Colour(int piece)
+        {
+            return piece & colourMask;
+        }
+
+        public static int PieceType(int piece)
+        {
+            return piece & typeMask;
+        }
+        public static bool IsRookOrQueen(int piece)
+        {
+            return (piece & 0b110) == 0b110;
+        }
+
+        public static bool IsBishopOrQueen(int piece)
+        {
+            return (piece & 0b101) == 0b101;
+        }
+
+        public static bool IsSlidingPiece(int piece)
+        {
+            return (piece & 0b100) != 0;
+        }
     }
 }
