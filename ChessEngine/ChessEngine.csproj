@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <Folder Include="assets\pieces\" />
-    <Folder Include="Model\BitBoard\BinaryMoveGen\" />
   </ItemGroup>
 
   <ItemGroup>
