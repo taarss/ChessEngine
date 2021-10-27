@@ -111,8 +111,8 @@ namespace ChessEngine.View
                     {
                         boardViewModel.MoveLogic.PlacePiece(item);
                         UnmarkLegalMoves();
-                        System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chri45n5/source/repos/ChessEngine/ChessEngine/assets/sounds/chess.wav");
-                        //System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chris/Source/Repos/Chess/ChessEngine/assets/sounds/chess.wav");
+                        //System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chri45n5/source/repos/ChessEngine/ChessEngine/assets/sounds/chess.wav");
+                        System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chris/Source/Repos/Chess/ChessEngine/assets/sounds/chess.wav");
                         player.Play();
                         isDragging = false;
                         followPiece.Visibility = Visibility.Collapsed;

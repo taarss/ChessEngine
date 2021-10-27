@@ -47,7 +47,7 @@ namespace ChessEngine.Model.AI
 			board = (BoardViewModel)App.Current.Resources["boardViewModel"];
 			board.MoveLogic.SetViewModel();
 			searchStopwatch.Start();
-			SearchMoves(6, 0, negativeInfinity, positiveInfinity);
+			SearchMoves(4, 0, negativeInfinity, positiveInfinity);
 			//SearchMoves(5, 0, negativeInfinity, positiveInfinity);
 			searchStopwatch.Stop();
             Console.WriteLine(searchStopwatch.ElapsedMilliseconds);
@@ -124,9 +124,6 @@ namespace ChessEngine.Model.AI
 				// Move was *too* good, so opponent won't allow this position to be reached
 				// (by choosing a different move earlier on). Skip remaining moves.
 				
-					
-				if (isCaptureMove)
-				{
 					if (eval > beta)
 					{
 						numCutoffs++;
@@ -144,7 +141,7 @@ namespace ChessEngine.Model.AI
 							bestEvalThisIteration = eval;
 						}
 					}
-				}
+				
 					
 				
 				
