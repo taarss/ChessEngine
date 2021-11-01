@@ -70,7 +70,9 @@ namespace ChessEngine.View
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             testResults.Children.Clear();
-            AI ai = new(boardViewModel.bitBoard);
+            //BitBoard tempBoard = new(boardViewModel.bitBoard);
+            BitBoard tempBoard = boardViewModel.bitBoard;
+            AI ai = new(tempBoard);
             ai.StartSearch();
             boardViewModel.bitBoard.MakeMove(ai.GetSearchResult());
             boardViewModel.UpdateGUI();

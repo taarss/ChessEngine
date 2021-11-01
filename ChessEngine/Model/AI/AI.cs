@@ -59,7 +59,7 @@ namespace ChessEngine.Model.AI
 			
 			
 			
-			SearchMoves(3, 0, negativeInfinity, positiveInfinity);
+			SearchMoves(4, 0, negativeInfinity, positiveInfinity);
 			bestMove = bestMoveThisIteration;
 			bestEval = bestEvalThisIteration;		
 		}
@@ -76,6 +76,7 @@ namespace ChessEngine.Model.AI
 
 		int SearchMoves(int depth, int plyFromRoot, int alpha, int beta)
 		{
+
 			if (abortSearch)
 			{
 				return 0;
@@ -110,9 +111,10 @@ namespace ChessEngine.Model.AI
 				
 			}
 			BitMove bestMoveInThisPosition = invalidMove;
-
+			BoardViewModel vm = (BoardViewModel)App.Current.Resources["boardViewModel"];
 			for (int i = 0; i < moves.Count; i++)
 			{
+				board = new(vm.bitBoard);
 				board.MakeMove(moves[i], inSearch: true);
 				int eval = -SearchMoves(depth - 1, plyFromRoot + 1, -beta, -alpha);
 				board.UnmakeMove(moves[i], inSearch: true);

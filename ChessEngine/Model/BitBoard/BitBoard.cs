@@ -51,9 +51,29 @@ namespace ChessEngine.Model.BitBoard
         public BitBoard()
         {
             Square = new int[64];
-            Square[0] = BitPiece.White | BitPiece.Bishop;
         }
+		public BitBoard(BitBoard bitBoard)
+        {
+			Square = new int[64];
+			Initialize();
+			bitBoard.Square.CopyTo(Square, 0);
+			WhiteToMove = bitBoard.WhiteToMove;
+			ColourToMove = bitBoard.ColourToMove;
+			OpponentColour = bitBoard.OpponentColour;
+			ColourToMoveIndex = bitBoard.ColourToMoveIndex;
+			gameStateHistory = bitBoard.gameStateHistory;
+			currentGameState = bitBoard.currentGameState;
+			plyCount = bitBoard.plyCount;
+			fiftyMoveCounter = bitBoard.fiftyMoveCounter;
+			bitBoard.KingSquare.CopyTo(KingSquare, 0);
+			bitBoard.rooks.CopyTo(rooks, 0);
+			bitBoard.bishops.CopyTo(bishops, 0);
+			bitBoard.queens.CopyTo(queens, 0);
+			bitBoard.knights.CopyTo(knights, 0);
+			bitBoard.pawns.CopyTo(pawns, 0);
 
+			bitBoard.allPieceLists.CopyTo(allPieceLists, 0);
+	}
 		PieceList GetPieceList(int pieceType, int colourIndex)
 		{
 			return allPieceLists[colourIndex * 8 + pieceType];
@@ -259,7 +279,11 @@ namespace ChessEngine.Model.BitBoard
 			// ignore ep captures, handled later
 			if (capturedPieceType != 0 && !isEnPassant)
 			{
-				GetPieceList(capturedPieceType, opponentColourIndex).AddPieceAtSquare(movedTo);
+				PieceList test = GetPieceList(capturedPieceType, opponentColourIndex);
+				if (test.Count != 16)
+				{
+					test.AddPieceAtSquare(movedTo);
+				}
 			}
 
 			// Update king index

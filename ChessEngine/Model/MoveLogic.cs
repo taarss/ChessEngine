@@ -98,20 +98,9 @@ namespace ChessEngine.Model
         }
         public void PlacePiece(Move move)
         {
-            if (move.isCastleMove)
-            {
-                boardViewModel.MoveLogic.MakeMove(new Move(move.StartSquare, move.TargetSquare));
-                boardViewModel.MoveLogic.MakeMove(new Move(move.CastleStart, move.CastleTarget));
-            }
-            else if (move.isEnPassent)
-            {
-                RemovePieceAtIndex(move.EnPassentIndex);
-                boardViewModel.MoveLogic.MakeMove(move);
-            }
-            else
-            {
-                boardViewModel.MoveLogic.MakeMove(move);
-            }
+            boardViewModel.bitBoard.MakeMove(new BitBoard.BitMove(move.StartSquare, move.TargetSquare));
+            boardViewModel.UpdateGUI();
+
         }
 
 

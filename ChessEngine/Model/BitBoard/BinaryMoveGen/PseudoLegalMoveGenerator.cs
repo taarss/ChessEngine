@@ -26,8 +26,8 @@ namespace ChessEngine.Model.BitBoard.BinaryMoveGen
 			Init();
 			GenerateKingMoves();
 			GenerateSlidingMoves();
-			GenerateKnightMoves();
 			GeneratePawnMoves();
+			GenerateKnightMoves();
 
 			return moves;
 		}
@@ -156,7 +156,7 @@ namespace ChessEngine.Model.BitBoard.BinaryMoveGen
 					// Square ahead of pawn is empty: forward moves
 					if (squareOneForward < 64 && squareOneForward > 0 && board.Square[squareOneForward] == BitPiece.None)
 					{
-						// Pawn not pinned, or is moving along line of pin
+						// Pawn not pinned, or is mov	ing along line of pin
 
 						moves.Add(new BitMove(startSquare, squareOneForward));
 
