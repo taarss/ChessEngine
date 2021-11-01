@@ -81,7 +81,11 @@ namespace ChessEngine.Model.BitBoard
 			currentGameState |= (ushort)(capturedPieceType << 8);
 			if (capturedPieceType != 0 && !isEnPassant)
 			{
-				GetPieceList(capturedPieceType, opponentColourIndex).RemovePieceAtSquare(moveTo);
+				PieceList test = GetPieceList(capturedPieceType, opponentColourIndex);
+                if (test.Count != 0)
+                {
+					test.RemovePieceAtSquare(moveTo);
+				}
 			}
 
 			// Move pieces in piece lists
@@ -274,22 +278,7 @@ namespace ChessEngine.Model.BitBoard
 
 			if (isPromotion)
 			{
-				pawns[ColourToMoveIndex].AddPieceAtSquare(movedFrom);
-				switch (moveFlags)
-				{
-					case BitMove.Flag.PromoteToQueen:
-						queens[ColourToMoveIndex].RemovePieceAtSquare(movedTo);
-						break;
-					case BitMove.Flag.PromoteToKnight:
-						knights[ColourToMoveIndex].RemovePieceAtSquare(movedTo);
-						break;
-					case BitMove.Flag.PromoteToRook:
-						rooks[ColourToMoveIndex].RemovePieceAtSquare(movedTo);
-						break;
-					case BitMove.Flag.PromoteToBishop:
-						bishops[ColourToMoveIndex].RemovePieceAtSquare(movedTo);
-						break;
-				}
+				
 			}
 			
 			else if (moveFlags == BitMove.Flag.Castling)

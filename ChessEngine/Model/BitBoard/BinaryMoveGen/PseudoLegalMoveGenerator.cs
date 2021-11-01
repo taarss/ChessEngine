@@ -154,7 +154,7 @@ namespace ChessEngine.Model.BitBoard.BinaryMoveGen
 					int squareOneForward = startSquare + pawnOffset;
 
 					// Square ahead of pawn is empty: forward moves
-					if (board.Square[squareOneForward] == BitPiece.None)
+					if (squareOneForward < 64 && squareOneForward > 0 && board.Square[squareOneForward] == BitPiece.None)
 					{
 						// Pawn not pinned, or is moving along line of pin
 
@@ -165,7 +165,7 @@ namespace ChessEngine.Model.BitBoard.BinaryMoveGen
 						if (rank == startRank)
 						{
 							int squareTwoForward = squareOneForward + pawnOffset;
-							if (board.Square[squareTwoForward] == BitPiece.None)
+							if (squareTwoForward < 64 && squareTwoForward > 0 && board.Square[squareTwoForward] == BitPiece.None)
 							{
 								// Not in check, or pawn is interposing checking piece
 

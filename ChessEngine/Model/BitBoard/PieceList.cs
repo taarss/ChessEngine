@@ -10,13 +10,12 @@ namespace ChessEngine.Model.BitBoard
     {
         public int[] occupiedSquares;
         int[] map;
-        int numPieces;
+        int numPieces = 0;
 
         public PieceList(int maxPieceCount = 16)
         {
-            occupiedSquares = new int[maxPieceCount];
+            occupiedSquares = new int[16];
             map = new int[64];
-            numPieces = 0;
         }
 
         public int Count

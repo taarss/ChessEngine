@@ -56,8 +56,7 @@ namespace ChessEngine.Model.AI
 
 			abortSearch = false;
 
-			// Iterative deepening. This means doing a full search with a depth of 1, then with a depth of 2, and so on.
-			// This allows the search to be aborted at any time, while still yielding a useful result from the last search.
+			
 			
 			
 			SearchMoves(3, 0, negativeInfinity, positiveInfinity);
@@ -65,9 +64,9 @@ namespace ChessEngine.Model.AI
 			bestEval = bestEvalThisIteration;		
 		}
 
-		public (BitMove move, int eval) GetSearchResult()
+		public BitMove GetSearchResult()
 		{
-			return (bestMove, bestEval);
+			return bestMove;
 		}
 
 		public void EndSearch()

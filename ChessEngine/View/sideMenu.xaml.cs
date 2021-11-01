@@ -72,6 +72,7 @@ namespace ChessEngine.View
             testResults.Children.Clear();
             AI ai = new(boardViewModel.bitBoard);
             ai.StartSearch();
+            boardViewModel.bitBoard.MakeMove(ai.GetSearchResult());
             boardViewModel.UpdateGUI();
         }
     }
