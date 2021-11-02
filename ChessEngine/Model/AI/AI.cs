@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using ChessEngine.ViewModel;
 using ChessEngine.Model.BitBoard;
-using ChessEngine.Model.BitBoard.BinaryMoveGen;
 namespace ChessEngine.Model.AI
 {
     public class AI
@@ -17,7 +16,6 @@ namespace ChessEngine.Model.AI
 
 		public event System.Action<Move> onSearchComplete;
 
-		PseudoLegalMoveGenerator moveGenerator;
 
 		BitMove bestMoveThisIteration;
 		int bestEvalThisIteration;
@@ -41,7 +39,6 @@ namespace ChessEngine.Model.AI
 		{
 			this.board = board;
 			evaluation = new Evaluate();
-			moveGenerator = new PseudoLegalMoveGenerator();
 			invalidMove = BitMove.InvalidMove;
 		}
 
@@ -103,21 +100,21 @@ namespace ChessEngine.Model.AI
 				return evaluation;
 			}
 
-			List<BitMove> moves = moveGenerator.GenerateMoves(board);
+			List<BitMove> moves;
 			// Detect checkmate and stalemate when no legal moves are available
-			if (moves.Count == 0)
+			/*if (moves.Count == 0)
 			{
 				return 0;
 				
-			}
+			}*/
 			BitMove bestMoveInThisPosition = invalidMove;
 			BoardViewModel vm = (BoardViewModel)App.Current.Resources["boardViewModel"];
-			for (int i = 0; i < moves.Count; i++)
+			for (int i = 0; i < 9; i++)
 			{
 				board = new(vm.bitBoard);
-				board.MakeMove(moves[i], inSearch: true);
+				//board.MakeMove(moves[i], inSearch: true);
 				int eval = -SearchMoves(depth - 1, plyFromRoot + 1, -beta, -alpha);
-				board.UnmakeMove(moves[i], inSearch: true);
+				//board.UnmakeMove(moves[i], inSearch: true);
 				numNodes++;
 
 				// Move was *too* good, so opponent won't allow this position to be reached
@@ -132,12 +129,12 @@ namespace ChessEngine.Model.AI
 				// Found a new best move in this position
 				if (eval > alpha)
 				{
-					bestMoveInThisPosition = moves[i];
+					//bestMoveInThisPosition = moves[i];
 
 					alpha = eval;
 					if (plyFromRoot == 0)
 					{
-						bestMoveThisIteration = moves[i];
+						//bestMoveThisIteration = moves[i];
 						bestEvalThisIteration = eval;
 					}
 				}
@@ -162,8 +159,9 @@ namespace ChessEngine.Model.AI
 				alpha = eval;
 			}
 
-			var moves = moveGenerator.GenerateMoves(board);
-			for (int i = 0; i < moves.Count; i++)
+			//var moves = moveGenerator.GenerateMoves(board);
+			
+			/*for (int i = 0; i < moves.Count; i++)
 			{
 				board.MakeMove(moves[i], true);
 				eval = -QuiescenceSearch(-beta, -alpha);
@@ -179,7 +177,7 @@ namespace ChessEngine.Model.AI
 				{
 					alpha = eval;
 				}
-			}
+			}*/
 
 			return alpha;
 		}

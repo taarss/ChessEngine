@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ChessEngine.Model;
+using ChessEngine.Model.BitBoard;
 using ChessEngine.Model.Piece;
 using ChessEngine.ViewModel;
 
@@ -109,6 +110,7 @@ namespace ChessEngine.View
                 {
                     if (item.TargetSquare == index)
                     {
+                        boardViewModel.oldMoves.Push(new BitMove(item.StartSquare, item.TargetSquare));
                         boardViewModel.MoveLogic.PlacePiece(item);
                         UnmarkLegalMoves();
                         System.Media.SoundPlayer player = new System.Media.SoundPlayer("C:/Users/chri45n5/source/repos/ChessEngine/ChessEngine/assets/sounds/chess.wav");

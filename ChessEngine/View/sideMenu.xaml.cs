@@ -16,7 +16,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ChessEngine.Model.AI;
 using ChessEngine.Model.BitBoard;
-using ChessEngine.Model.BitBoard.BinaryMoveGen;
 
 namespace ChessEngine.View
 {
@@ -35,6 +34,10 @@ namespace ChessEngine.View
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            boardViewModel.bitBoard.UnmakeMove(boardViewModel.oldMoves.Pop());
+
+            boardViewModel.UpdateGUI();
+            /*
             Stopwatch stopwatch = new();
             for (int i = 0; i < 1; i++)
             {
@@ -64,7 +67,7 @@ namespace ChessEngine.View
                 canvas.Children.Add(text);
                 canvas.Height = 50;
                 testResults.Children.Add(canvas);
-            }
+            }*/
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -74,7 +77,7 @@ namespace ChessEngine.View
             BitBoard tempBoard = boardViewModel.bitBoard;
             AI ai = new(tempBoard);
             ai.StartSearch();
-            boardViewModel.bitBoard.MakeMove(ai.GetSearchResult());
+            //boardViewModel.bitBoard.MakeMove(ai.GetSearchResult());
             boardViewModel.UpdateGUI();
         }
     }

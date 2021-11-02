@@ -27,7 +27,7 @@ namespace ChessEngine.ViewModel
         private Debuger debuger = new();
         private Coordinate followPieceCoordinates = new Coordinate(100, 100);
         public BitBoard bitBoard = new();
-
+        public Stack<BitMove> oldMoves = new();
 
 
 

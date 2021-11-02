@@ -33,15 +33,15 @@ namespace ChessEngine.Model.AI
 				int whiteMaterial = CountMaterial(BitBoard.BitBoard.WhiteIndex);
 				int blackMaterial = CountMaterial(BitBoard.BitBoard.BlackIndex);
 
-				int whiteMaterialWithoutPawns = whiteMaterial - board.pawns[BitBoard.BitBoard.WhiteIndex].Count * pawnValue;
-				int blackMaterialWithoutPawns = blackMaterial - board.pawns[BitBoard.BitBoard.BlackIndex].Count * pawnValue;
-				float whiteEndgamePhaseWeight = EndgamePhaseWeight(whiteMaterialWithoutPawns);
-				float blackEndgamePhaseWeight = EndgamePhaseWeight(blackMaterialWithoutPawns);
+				//int whiteMaterialWithoutPawns = whiteMaterial - board.pawns[BitBoard.BitBoard.WhiteIndex].Count * pawnValue;
+				//int blackMaterialWithoutPawns = blackMaterial - board.pawns[BitBoard.BitBoard.BlackIndex].Count * pawnValue;
+				//float whiteEndgamePhaseWeight = EndgamePhaseWeight(whiteMaterialWithoutPawns);
+				//float blackEndgamePhaseWeight = EndgamePhaseWeight(blackMaterialWithoutPawns);
 
 				whiteEval += whiteMaterial;
 				blackEval += blackMaterial;
-				whiteEval += MopUpEval(BitBoard.BitBoard.WhiteIndex, BitBoard.BitBoard.BlackIndex, whiteMaterial, blackMaterial, blackEndgamePhaseWeight);
-				blackEval += MopUpEval(BitBoard.BitBoard.BlackIndex, BitBoard.BitBoard.WhiteIndex, blackMaterial, whiteMaterial, whiteEndgamePhaseWeight);
+				//whiteEval += MopUpEval(BitBoard.BitBoard.WhiteIndex, BitBoard.BitBoard.BlackIndex, whiteMaterial, blackMaterial, blackEndgamePhaseWeight);
+				//blackEval += MopUpEval(BitBoard.BitBoard.BlackIndex, BitBoard.BitBoard.WhiteIndex, blackMaterial, whiteMaterial, whiteEndgamePhaseWeight);
 
 				int eval = whiteEval - blackEval;
 
@@ -61,11 +61,11 @@ namespace ChessEngine.Model.AI
 				if (myMaterial > opponentMaterial + pawnValue * 2 && endgameWeight > 0)
 				{
 
-					int friendlyKingSquare = board.KingSquare[friendlyIndex];
-					int opponentKingSquare = board.KingSquare[opponentIndex];
-					mopUpScore += PrecomputedMoveData.centreManhattanDistance[opponentKingSquare] * 10;
+					//int friendlyKingSquare = board.KingSquare[friendlyIndex];
+					//int opponentKingSquare = board.KingSquare[opponentIndex];
+					//mopUpScore += PrecomputedMoveData.centreManhattanDistance[opponentKingSquare] * 10;
 					// use ortho dst to promote direct opposition
-					mopUpScore += (14 - PrecomputedMoveData.NumRookMovesToReachSquare(friendlyKingSquare, opponentKingSquare)) * 4;
+					//mopUpScore += (14 - PrecomputedMoveData.NumRookMovesToReachSquare(friendlyKingSquare, opponentKingSquare)) * 4;
 
 					return (int)(mopUpScore * endgameWeight);
 				}
@@ -75,11 +75,11 @@ namespace ChessEngine.Model.AI
 			int CountMaterial(int colourIndex)
 			{
 				int material = 0;
-				material += board.pawns[colourIndex].Count * pawnValue;
-				material += board.knights[colourIndex].Count * knightValue;
-				material += board.bishops[colourIndex].Count * bishopValue;
-				material += board.rooks[colourIndex].Count * rookValue;
-				material += board.queens[colourIndex].Count * queenValue;
+				//material += board.pawns[colourIndex].Count * pawnValue;
+				//material += board.knights[colourIndex].Count * knightValue;
+				//material += board.bishops[colourIndex].Count * bishopValue;
+				//material += board.rooks[colourIndex].Count * rookValue;
+				//material += board.queens[colourIndex].Count * queenValue;
 
 				return material;
 			}					

@@ -28,8 +28,8 @@
             <StackPanel x:Name="testResults" Orientation="Vertical" Height="267" Width="453" Canvas.Left="269" Canvas.Top="42">
 
             </StackPanel>
-            <Button Canvas.Left="461" Canvas.Top="399" Click="Button_Click" Width="175" Height="38">Run Test</Button>
-            <Button Canvas.Left="271" Canvas.Top="399"  Width="175" Height="38" Click="Button_Click_1">Clear Results</Button>
+            <Button Canvas.Left="461" Canvas.Top="399" Click="Button_Click" Width="175" Height="38">Unmake move</Button>
+            <Button Canvas.Left="271" Canvas.Top="399"  Width="175" Height="38" Click="Button_Click_1">Run AI</Button>
             <TextBlock Text="{Binding Debuger.NumPositionsBinding, UpdateSourceTrigger=PropertyChanged, IsAsync=True, Mode=OneWay}" FontWeight="DemiBold"  FontSize="30" Foreground="White" Canvas.Left="284" Canvas.Top="326" Width="103"></TextBlock>
         </Canvas>
     </Grid>

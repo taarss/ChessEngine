@@ -10,13 +10,11 @@ namespace ChessEngine.Model.BitBoard
     public class BitBoard
     {
         public int[] Square;
-
         public const int WhiteIndex = 0;
         public const int BlackIndex = 1;
 
         public bool WhiteToMove;
         public int ColourToMove;
-        public int OpponentColour;
         public int ColourToMoveIndex;
 
         // Bits 0-3 store white and black kingside/queenside castling legality
@@ -29,15 +27,6 @@ namespace ChessEngine.Model.BitBoard
         public int plyCount; // Total plies played in game
         public int fiftyMoveCounter; // Num ply since last pawn move or capture
 
-        public int[] KingSquare; // index of square of white and black king
-
-        public PieceList[] rooks;
-        public PieceList[] bishops;
-        public PieceList[] queens;
-        public PieceList[] knights;
-        public PieceList[] pawns;
-
-		PieceList[] allPieceLists;
 
         const uint whiteCastleKingsideMask = 0b1111111111111110;
         const uint whiteCastleQueensideMask = 0b1111111111111101;
@@ -59,91 +48,98 @@ namespace ChessEngine.Model.BitBoard
 			bitBoard.Square.CopyTo(Square, 0);
 			WhiteToMove = bitBoard.WhiteToMove;
 			ColourToMove = bitBoard.ColourToMove;
-			OpponentColour = bitBoard.OpponentColour;
 			ColourToMoveIndex = bitBoard.ColourToMoveIndex;
 			gameStateHistory = bitBoard.gameStateHistory;
 			currentGameState = bitBoard.currentGameState;
 			plyCount = bitBoard.plyCount;
 			fiftyMoveCounter = bitBoard.fiftyMoveCounter;
-			bitBoard.KingSquare.CopyTo(KingSquare, 0);
-			bitBoard.rooks.CopyTo(rooks, 0);
-			bitBoard.bishops.CopyTo(bishops, 0);
-			bitBoard.queens.CopyTo(queens, 0);
-			bitBoard.knights.CopyTo(knights, 0);
-			bitBoard.pawns.CopyTo(pawns, 0);
-
-			bitBoard.allPieceLists.CopyTo(allPieceLists, 0);
-	}
-		PieceList GetPieceList(int pieceType, int colourIndex)
-		{
-			return allPieceLists[colourIndex * 8 + pieceType];
+			
 		}
 
-		public void MakeMove(BitMove move, bool inSearch = false)
+
+
+		public void LoadStartPosition()
 		{
+			LoadPosition(Fen.startFen);
+		}
+
+		public void SwitchTurn()
+        {
+			WhiteToMove = !WhiteToMove; // false
+			ColourToMove = (WhiteToMove) ? BitPiece.White : BitPiece.Black; // white = 8 black = 16
+			ColourToMoveIndex = 1 - ColourToMoveIndex; // 0 = white 1 = black
+		}
+
+		public void ChangeTurnToWhite(bool turn)
+        {
+			WhiteToMove = turn;
+			ColourToMove = (turn) ? BitPiece.White : BitPiece.Black; // white = 8 black = 16
+			ColourToMoveIndex = (turn) ? 0 : 1;
+		}
+
+		// Load custom position from fen string
+		public void LoadPosition(string fen)
+		{
+			Initialize();
+			var loadedPosition = Fen.PositionFromFen(fen);
+
+			// Load pieces into board array and piece lists
+			for (int squareIndex = 0; squareIndex < 64; squareIndex++)
+			{
+				int piece = loadedPosition.squares[squareIndex];
+				Square[squareIndex] = piece;				
+			}
+
+			// Side to move
+			WhiteToMove = loadedPosition.whiteToMove;
+			ColourToMove = (WhiteToMove) ? BitPiece.White : BitPiece.Black;
+			ColourToMoveIndex = (WhiteToMove) ? 0 : 1;
+
+			// Create gamestate
+			int whiteCastle = ((loadedPosition.whiteCastleKingside) ? 1 << 0 : 0) | ((loadedPosition.whiteCastleQueenside) ? 1 << 1 : 0);
+			int blackCastle = ((loadedPosition.blackCastleKingside) ? 1 << 2 : 0) | ((loadedPosition.blackCastleQueenside) ? 1 << 3 : 0);
+			int epState = loadedPosition.epFile << 4;
+			ushort initialGameState = (ushort)(whiteCastle | blackCastle | epState);
+			gameStateHistory.Push(initialGameState);
+			currentGameState = initialGameState;
+			plyCount = loadedPosition.plyCount;
+
+		}
+		
+
+		void Initialize()
+		{
+			Square = new int[64];
+			gameStateHistory = new Stack<uint>();
+			plyCount = 0;
+			fiftyMoveCounter = 0;
+		}
+		public void MakeMove(BitMove move)
+        {
 			uint originalCastleState = currentGameState & 15;
 			uint newCastleState = originalCastleState;
 			currentGameState = 0;
-
-			int opponentColourIndex = 1 - ColourToMoveIndex;
 			int moveFrom = move.StartSquare;
 			int moveTo = move.TargetSquare;
-
-			int capturedPieceType = BitPiece.PieceType(Square[moveTo]);
-			int movePiece = Square[moveFrom];
-			int movePieceType = BitPiece.PieceType(movePiece);
-
+			int capturedPieceType = Square[moveTo];
+			int opponentColourIndex = 1 - ColourToMoveIndex;
 			int moveFlag = move.MoveFlag;
-			bool isPromotion = move.IsPromotion;
-			bool isEnPassant = moveFlag == BitMove.Flag.EnPassantCapture;
+			int movePiece = Square[moveFrom];
 
-			// Handle captures
 			currentGameState |= (ushort)(capturedPieceType << 8);
-			if (capturedPieceType != 0 && !isEnPassant)
-			{
-				PieceList test = GetPieceList(capturedPieceType, opponentColourIndex);
-                if (test.Count != 0)
-                {
-					test.RemovePieceAtSquare(moveTo);
-				}
+			int pieceColourIndex = (BitPiece.IsColour(movePiece, BitPiece.White)) ? WhiteIndex : BlackIndex;
+
+            if (move.MoveFlag == BitMove.Flag.Castling)
+            {
+				bool kingside = moveTo == BoardRepresentation.g1 || moveTo == BoardRepresentation.g8;
+				int castlingRookFromIndex = (kingside) ? moveTo + 1 : moveTo - 2;
+				int castlingRookToIndex = (kingside) ? moveTo - 1 : moveTo + 1;
+				Square[castlingRookFromIndex] = BitPiece.None;
+				Square[castlingRookToIndex] = BitPiece.Rook | ColourToMove;
 			}
-
-			// Move pieces in piece lists
-			if (movePieceType == BitPiece.King)
-			{
-				KingSquare[ColourToMoveIndex] = moveTo;
-				newCastleState &= (WhiteToMove) ? whiteCastleMask : blackCastleMask;
-			}
-			else
-			{
-				GetPieceList(movePieceType, ColourToMoveIndex).MovePiece(moveFrom, moveTo);
-			}
-
-			int pieceOnTargetSquare = movePiece;
-				// Handle other special moves (en-passant, and castling)
-				switch (moveFlag)
-				{
-					case BitMove.Flag.EnPassantCapture:
-						int epPawnSquare = moveTo + ((ColourToMove == BitPiece.White) ? -8 : 8);
-						currentGameState |= (ushort)(Square[epPawnSquare] << 8); // add pawn as capture type
-						Square[epPawnSquare] = 0; // clear ep capture square
-						pawns[opponentColourIndex].RemovePieceAtSquare(epPawnSquare);
-						break;
-					case BitMove.Flag.Castling:
-						bool kingside = moveTo == BoardRepresentation.g1 || moveTo == BoardRepresentation.g8;
-						int castlingRookFromIndex = (kingside) ? moveTo + 1 : moveTo - 2;
-						int castlingRookToIndex = (kingside) ? moveTo - 1 : moveTo + 1;
-
-						Square[castlingRookFromIndex] = BitPiece.None;
-						Square[castlingRookToIndex] = BitPiece.Rook | ColourToMove;
-
-						rooks[ColourToMoveIndex].MovePiece(castlingRookFromIndex, castlingRookToIndex);			
-						break;
-				}
-			
 
 			// Update the board representation:
-			Square[moveTo] = pieceOnTargetSquare;
+			Square[moveTo] = movePiece;
 			Square[moveFrom] = 0;
 
 			// Piece moving to/from rook square removes castling right for that side
@@ -165,147 +161,40 @@ namespace ChessEngine.Model.BitBoard
 				{
 					newCastleState &= blackCastleQueensideMask;
 				}
+
+
+				currentGameState |= newCastleState;
+				currentGameState |= (uint)fiftyMoveCounter << 14;
+				gameStateHistory.Push(currentGameState);
+
+				// Change side to move
+				SwitchTurn();
+				plyCount++;
+				fiftyMoveCounter++;
 			}
-
-			currentGameState |= newCastleState;
-			currentGameState |= (uint)fiftyMoveCounter << 14;
-			gameStateHistory.Push(currentGameState);
-
-			// Change side to move
-			WhiteToMove = !WhiteToMove;
-			ColourToMove = (WhiteToMove) ? BitPiece.White : BitPiece.Black;
-			OpponentColour = (WhiteToMove) ? BitPiece.Black : BitPiece.White;
-			ColourToMoveIndex = 1 - ColourToMoveIndex;
-			plyCount++;
-			fiftyMoveCounter++;
 		}
-
-		public void LoadStartPosition()
-		{
-			LoadPosition(Fen.startFen);
-		}
-
-		// Load custom position from fen string
-		public void LoadPosition(string fen)
-		{
-			Initialize();
-			var loadedPosition = Fen.PositionFromFen(fen);
-
-			// Load pieces into board array and piece lists
-			for (int squareIndex = 0; squareIndex < 64; squareIndex++)
-			{
-				int piece = loadedPosition.squares[squareIndex];
-				Square[squareIndex] = piece;
-
-				if (piece != BitPiece.None)
-				{
-					int pieceType = BitPiece.PieceType(piece);
-					int pieceColourIndex = (BitPiece.IsColour(piece, BitPiece.White)) ? WhiteIndex : BlackIndex;
-					if (BitPiece.IsSlidingPiece(piece))
-					{
-						if (pieceType == BitPiece.Queen)
-						{
-							queens[pieceColourIndex].AddPieceAtSquare(squareIndex);
-						}
-						else if (pieceType == BitPiece.Rook)
-						{
-							rooks[pieceColourIndex].AddPieceAtSquare(squareIndex);
-						}
-						else if (pieceType == BitPiece.Bishop)
-						{
-							bishops[pieceColourIndex].AddPieceAtSquare(squareIndex);
-						}
-					}
-					else if (pieceType == BitPiece.Knight)
-					{
-						knights[pieceColourIndex].AddPieceAtSquare(squareIndex);
-					}
-					else if (pieceType == BitPiece.Pawn)
-					{
-						pawns[pieceColourIndex].AddPieceAtSquare(squareIndex);
-					}
-					else if (pieceType == BitPiece.King)
-					{
-						KingSquare[pieceColourIndex] = squareIndex;
-					}
-				}
-			}
-
-			// Side to move
-			WhiteToMove = loadedPosition.whiteToMove;
-			ColourToMove = (WhiteToMove) ? BitPiece.White : BitPiece.Black;
-			OpponentColour = (WhiteToMove) ? BitPiece.Black : BitPiece.White;
-			ColourToMoveIndex = (WhiteToMove) ? 0 : 1;
-
-			// Create gamestate
-			int whiteCastle = ((loadedPosition.whiteCastleKingside) ? 1 << 0 : 0) | ((loadedPosition.whiteCastleQueenside) ? 1 << 1 : 0);
-			int blackCastle = ((loadedPosition.blackCastleKingside) ? 1 << 2 : 0) | ((loadedPosition.blackCastleQueenside) ? 1 << 3 : 0);
-			int epState = loadedPosition.epFile << 4;
-			ushort initialGameState = (ushort)(whiteCastle | blackCastle | epState);
-			gameStateHistory.Push(initialGameState);
-			currentGameState = initialGameState;
-			plyCount = loadedPosition.plyCount;
-
-		}
-		public void UnmakeMove(BitMove move, bool inSearch = false)
-		{
-
-			//int opponentColour = ColourToMove;
-			int opponentColourIndex = ColourToMoveIndex;
-			bool undoingWhiteMove = OpponentColour == BitPiece.White;
-			ColourToMove = OpponentColour; // side who made the move we are undoing
-			OpponentColour = (undoingWhiteMove) ? BitPiece.Black : BitPiece.White;
-			ColourToMoveIndex = 1 - ColourToMoveIndex;
-			WhiteToMove = !WhiteToMove;
-
+		public void UnmakeMove(BitMove move)
+        {
 			uint originalCastleState = currentGameState & 0b1111;
-
 			int capturedPieceType = ((int)currentGameState >> 8) & 63;
-			int capturedPiece = (capturedPieceType == 0) ? 0 : capturedPieceType | OpponentColour;
+			int capturedPiece = (capturedPieceType == 0) ? 0 : capturedPieceType;
 
 			int movedFrom = move.StartSquare;
 			int movedTo = move.TargetSquare;
 			int moveFlags = move.MoveFlag;
+
 			bool isEnPassant = moveFlags == BitMove.Flag.EnPassantCapture;
 			bool isPromotion = move.IsPromotion;
-
-			int toSquarePieceType = BitPiece.PieceType(Square[movedTo]);
+			int toSquarePieceType = Square[movedTo];
 			int movedPieceType = (isPromotion) ? BitPiece.Pawn : toSquarePieceType;
+			ChangeTurnToWhite(BitPiece.IsColour(Square[movedTo], 8));
 
-			
 			uint oldEnPassantFile = (currentGameState >> 4) & 15;
-			
-
-			// ignore ep captures, handled later
-			if (capturedPieceType != 0 && !isEnPassant)
-			{
-				PieceList test = GetPieceList(capturedPieceType, opponentColourIndex);
-				if (test.Count != 16)
-				{
-					test.AddPieceAtSquare(movedTo);
-				}
-			}
-
-			// Update king index
-			if (movedPieceType == BitPiece.King)
-			{
-				KingSquare[ColourToMoveIndex] = movedFrom;
-			}
-			else if (!isPromotion)
-			{
-				GetPieceList(movedPieceType, ColourToMoveIndex).MovePiece(movedTo, movedFrom);
-			}
 
 			// put back moved piece
-			Square[movedFrom] = movedPieceType | ColourToMove; // note that if move was a pawn promotion, this will put the promoted piece back instead of the pawn. Handled in special move switch
+			Square[movedFrom] = movedPieceType; // note that if move was a pawn promotion, this will put the promoted piece back instead of the pawn. Handled in special move switch
 			Square[movedTo] = capturedPiece; // will be 0 if no piece was captured
-
-			if (isPromotion)
-			{
-				
-			}
-			
-			else if (moveFlags == BitMove.Flag.Castling)
+			if (moveFlags == BitMove.Flag.Castling)
 			{ // castles: move rook back to starting square
 
 				bool kingside = movedTo == 6 || movedTo == 62;
@@ -315,9 +204,7 @@ namespace ChessEngine.Model.BitBoard
 				Square[castlingRookToIndex] = 0;
 				Square[castlingRookFromIndex] = BitPiece.Rook | ColourToMove;
 
-				rooks[ColourToMoveIndex].MovePiece(castlingRookToIndex, castlingRookFromIndex);
 			}
-
 			gameStateHistory.Pop(); // removes current state from history
 			currentGameState = gameStateHistory.Peek(); // sets current state to previous state in history
 
@@ -325,46 +212,7 @@ namespace ChessEngine.Model.BitBoard
 			int newEnPassantFile = (int)(currentGameState >> 4) & 15;
 
 			uint newCastleState = currentGameState & 0b1111;
-			
-
 			plyCount--;
-
-
-		}
-
-		void Initialize()
-		{
-			Square = new int[64];
-			KingSquare = new int[2];
-
-			gameStateHistory = new Stack<uint>();
-			plyCount = 0;
-			fiftyMoveCounter = 0;
-
-			knights = new PieceList[] { new PieceList(10), new PieceList(10) };
-			pawns = new PieceList[] { new PieceList(8), new PieceList(8) };
-			rooks = new PieceList[] { new PieceList(10), new PieceList(10) };
-			bishops = new PieceList[] { new PieceList(10), new PieceList(10) };
-			queens = new PieceList[] { new PieceList(9), new PieceList(9) };
-			PieceList emptyList = new PieceList(0);
-			allPieceLists = new PieceList[] {
-				emptyList,
-				emptyList,
-				pawns[WhiteIndex],
-				knights[WhiteIndex],
-				emptyList,
-				bishops[WhiteIndex],
-				rooks[WhiteIndex],
-				queens[WhiteIndex],
-				emptyList,
-				emptyList,
-				pawns[BlackIndex],
-				knights[BlackIndex],
-				emptyList,
-				bishops[BlackIndex],
-				rooks[BlackIndex],
-				queens[BlackIndex],
-			};
 		}
 	}
 }
