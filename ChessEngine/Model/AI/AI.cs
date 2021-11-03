@@ -111,7 +111,7 @@ namespace ChessEngine.Model.AI
 			BoardViewModel vm = (BoardViewModel)App.Current.Resources["boardViewModel"];
 			for (int i = 0; i < 9; i++)
 			{
-				board = new(vm.bitBoard);
+				board = new(vm.BitBoard);
 				//board.MakeMove(moves[i], inSearch: true);
 				int eval = -SearchMoves(depth - 1, plyFromRoot + 1, -beta, -alpha);
 				//board.UnmakeMove(moves[i], inSearch: true);

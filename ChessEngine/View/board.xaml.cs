@@ -85,11 +85,12 @@ namespace ChessEngine.View
         private void SelectPiece(object sender, MouseEventArgs e)
         {
             moves = new List<Move>();
+            List<BitMove> bitMoves = new();
             Point position = Mouse.GetPosition(myCanvas);
             oldIndex = CalculateIndexFromPosition(position);
             selectedPiece = boardViewModel.TheGrid[oldIndex].piece;
-            if (selectedPiece.IsWhite == boardViewModel.IsWhitesTurn)
-            {
+            if (selectedPiece.IsWhite == boardViewModel.BitBoard.WhiteToMove)
+            {  
                 moves = Check.GenerateLegelMoves(oldIndex, selectedPiece);
                 MarkLegalMoves(moves);
                 MarkAllAttackedSquares(boardViewModel.AttackMap);

@@ -38,7 +38,7 @@ namespace ChessEngine.Model.Piece
                     //Blocked my friendly piece
                     if (pieceOnTargetSquare != null)
                     {
-                        if (pieceOnTargetSquare.IsWhite == board.IsWhitesTurn)
+                        if (pieceOnTargetSquare.IsWhite == board.BitBoard.WhiteToMove)
                         {
                             board.AttackMap.Add(new Move(startSquare, targetSquare));
                             break;
@@ -51,7 +51,7 @@ namespace ChessEngine.Model.Piece
                     //Can't move further in this direction after capturing opponents piece
                     if (pieceOnTargetSquare != null)
                     {
-                        if (pieceOnTargetSquare.IsWhite != board.IsWhitesTurn)
+                        if (pieceOnTargetSquare.IsWhite != board.BitBoard.WhiteToMove)
                         {
                             board.AttackMap.Add(new Move(startSquare, targetSquare));
                             break;

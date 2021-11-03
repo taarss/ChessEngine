@@ -47,7 +47,7 @@ namespace ChessEngine.Model.Piece
                     else
                     {
                         //Check if the piece that's on the target square isn't friendly
-                        if (board.TheGrid[startSquare + item].piece.IsWhite != board.IsWhitesTurn)
+                        if (board.TheGrid[startSquare + item].piece.IsWhite != board.BitBoard.WhiteToMove)
                         {
                             moves.Add(new Move(startSquare, startSquare + item));
                         }
@@ -88,17 +88,21 @@ namespace ChessEngine.Model.Piece
                 }
                 //Castle queen side
                 //Same logic ^
-                Piece queenSideRook = board.TheGrid[startSquare - 4].piece;
-                if (queenSideRook != null && queenSideRook.Name == "Rook")
+                if (startSquare - 4 >= 0)
                 {
-                    if (board.TheGrid[startSquare - 1].piece == null && board.TheGrid[startSquare - 2].piece == null && board.TheGrid[startSquare - 3].piece == null)
+                    Piece queenSideRook = board.TheGrid[startSquare - 4].piece;
+                    if (queenSideRook != null && queenSideRook.Name == "Rook")
                     {
-                        if (!queenSideRook.HasMoved)
+                        if (board.TheGrid[startSquare - 1].piece == null && board.TheGrid[startSquare - 2].piece == null && board.TheGrid[startSquare - 3].piece == null)
                         {
-                            moves.Add(new Move(startSquare, startSquare - 2, startSquare - 1, startSquare - 4));
+                            if (!queenSideRook.HasMoved)
+                            {
+                                moves.Add(new Move(startSquare, startSquare - 2, startSquare - 1, startSquare - 4));
+                            }
                         }
                     }
                 }
+                
             }
             return moves;
         }

@@ -10,13 +10,13 @@ using ChessEngine.Model;
 using ChessEngine.Model.Piece;
 using ChessEngine.Model.AI;
 using ChessEngine.Model.BitBoard;
+using System.ComponentModel;
 
 namespace ChessEngine.ViewModel
 {
-    public class BoardViewModel
+    public class BoardViewModel : INotifyPropertyChanged
     {
 
-        private bool isWhitesTurn = true;
         private bool playerColor = true;
         private bool movePieceEnabled = false;
         private List<Move> moves;
@@ -26,7 +26,7 @@ namespace ChessEngine.ViewModel
         private MoveLogic moveLogic = new();
         private Debuger debuger = new();
         private Coordinate followPieceCoordinates = new Coordinate(100, 100);
-        public BitBoard bitBoard = new();
+        private BitBoard bitBoard = new();
         public Stack<BitMove> oldMoves = new();
 
 
@@ -42,14 +42,19 @@ namespace ChessEngine.ViewModel
                 theGrid.Add(new Cell(coordinates[0], coordinates[1]));
             }
            // LoadDefaultPosition();
-            bitBoard.LoadStartPosition();
+            BitBoard.LoadStartPosition();
             UpdateGUI();
 
         }
+        public event PropertyChangedEventHandler PropertyChanged;
 
+        private void RaisePropertyChanged(string property)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+        }
         public void UpdateGUI()
         {
-            Piece[] pieces = BoardRepresentation.TranslateBitBoardToUI(bitBoard);
+            Piece[] pieces = BoardRepresentation.TranslateBitBoardToUI(BitBoard);
             for (int i = 0; i < pieces.Length; i++)
             {
                 theGrid[i].piece = pieces[i];
@@ -146,11 +151,16 @@ namespace ChessEngine.ViewModel
         public Piece MovePiece { get => movePiece; set => movePiece = value; }
         public bool MovePieceEnabled { get => movePieceEnabled; set => movePieceEnabled = value; }
         public ObservableCollection<Cell> TheGrid { get => theGrid; set => theGrid = value; }
-        public bool IsWhitesTurn { get => isWhitesTurn; set => isWhitesTurn = value; }
         public List<Move> Moves { get => moves; set => moves = value; }
         public Coordinate FollowPieceCoordinates { get => followPieceCoordinates; set => followPieceCoordinates = value; }
         public Debuger Debuger { get => debuger; set => debuger = value; }
         public MoveLogic MoveLogic { get => moveLogic; set => moveLogic = value; }
         public bool PlayerColor { get => playerColor; set => playerColor = value; }
+        public BitBoard BitBoard { get => bitBoard; set
+            {
+                bitBoard = value;
+                RaisePropertyChanged("BitBoard");
+            }
+        }
     }
 }

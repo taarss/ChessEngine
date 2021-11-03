@@ -11,6 +11,9 @@
         <Canvas>
             <Rectangle x:Name="background" Height="480" Width="920"></Rectangle>
             <TextBlock FontWeight="DemiBold"  FontSize="30" Foreground="White" Canvas.Left="81">Moves</TextBlock>
+            <TextBlock FontWeight="DemiBold"  FontSize="30" Foreground="White" Canvas.Left="281">Current turn</TextBlock>
+            <TextBlock FontWeight="DemiBold"  FontSize="30" Foreground="White" Canvas.Left="281" Canvas.Top="43" Text="{Binding BitBoard.WhiteToMove, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Width="177"></TextBlock>
+
             <Border  BorderBrush="White" BorderThickness="3"  Canvas.Left="38" Canvas.Top="38">
                 <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Visible">
                     <StackPanel Background="LightGray" Orientation="Horizontal" Height="400" Width="177">

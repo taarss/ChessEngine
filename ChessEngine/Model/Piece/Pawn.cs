@@ -49,7 +49,7 @@ namespace ChessEngine.Model.Piece
                 if (startSquare + item >= 0 && startSquare + item > 64 && board.TheGrid[startSquare + item].piece != null)
                 {
                     //Check if the piece is friendly or hostile
-                    if (board.TheGrid[startSquare + item].piece.IsWhite != board.IsWhitesTurn)
+                    if (board.TheGrid[startSquare + item].piece.IsWhite != board.BitBoard.WhiteToMove)
                     {
                         //Check if the hostile pawn has made a double pawn push
                         //ERROR: this method does not check if the last move it made was a double pawn push

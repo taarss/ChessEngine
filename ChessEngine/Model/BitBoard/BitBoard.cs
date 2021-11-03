@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,13 +8,13 @@ using ChessEngine.Model.BitBoard;
 
 namespace ChessEngine.Model.BitBoard
 {
-    public class BitBoard
+    public class BitBoard : INotifyPropertyChanged
     {
         public int[] Square;
         public const int WhiteIndex = 0;
         public const int BlackIndex = 1;
 
-        public bool WhiteToMove;
+        private bool whiteToMove;
         public int ColourToMove;
         public int ColourToMoveIndex;
 
@@ -26,7 +27,7 @@ namespace ChessEngine.Model.BitBoard
 
         public int plyCount; // Total plies played in game
         public int fiftyMoveCounter; // Num ply since last pawn move or capture
-
+		public int OpponentColour;
 
         const uint whiteCastleKingsideMask = 0b1111111111111110;
         const uint whiteCastleQueensideMask = 0b1111111111111101;
@@ -36,8 +37,20 @@ namespace ChessEngine.Model.BitBoard
         const uint whiteCastleMask = whiteCastleKingsideMask & whiteCastleQueensideMask;
         const uint blackCastleMask = blackCastleKingsideMask & blackCastleQueensideMask;
 
+        public bool WhiteToMove { get => whiteToMove; set
+			{
+				whiteToMove = value;
+				RaisePropertyChanged("WhiteToMove");
+			}
+		}
 
-        public BitBoard()
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		private void RaisePropertyChanged(string property)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+		}
+		public BitBoard()
         {
             Square = new int[64];
         }
@@ -56,6 +69,7 @@ namespace ChessEngine.Model.BitBoard
 			
 		}
 
+		
 
 
 		public void LoadStartPosition()

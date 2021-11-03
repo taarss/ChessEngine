@@ -61,7 +61,7 @@ namespace ChessEngine.Model.Piece
                     else
                     {
                         //Check if the piece is not friendly
-                        if (board.TheGrid[startSquare + item].piece.IsWhite != board.IsWhitesTurn)
+                        if (board.TheGrid[startSquare + item].piece.IsWhite != board.BitBoard.WhiteToMove)
                         {
                             moves.Add(new Move(startSquare, startSquare + item));
                         }

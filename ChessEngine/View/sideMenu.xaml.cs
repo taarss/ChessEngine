@@ -34,9 +34,12 @@ namespace ChessEngine.View
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            boardViewModel.bitBoard.UnmakeMove(boardViewModel.oldMoves.Pop());
+            if (boardViewModel.oldMoves.Count != 0)
+            {
+                boardViewModel.BitBoard.UnmakeMove(boardViewModel.oldMoves.Pop());
+                boardViewModel.UpdateGUI();
+            }
 
-            boardViewModel.UpdateGUI();
             /*
             Stopwatch stopwatch = new();
             for (int i = 0; i < 1; i++)
@@ -74,7 +77,7 @@ namespace ChessEngine.View
         {
             testResults.Children.Clear();
             //BitBoard tempBoard = new(boardViewModel.bitBoard);
-            BitBoard tempBoard = boardViewModel.bitBoard;
+            BitBoard tempBoard = boardViewModel.BitBoard;
             AI ai = new(tempBoard);
             ai.StartSearch();
             //boardViewModel.bitBoard.MakeMove(ai.GetSearchResult());

@@ -60,7 +60,7 @@ namespace ChessEngine.Model
                 List<Move> tempMoves = new();
                 foreach (var item in opponentResponses)
                 {
-                    int kingIndex = GetKing(temp.IsWhitesTurn);
+                    int kingIndex = GetKing(temp.BitBoard.WhiteToMove);
                     if (item.TargetSquare == kingIndex)
                     {
                         resetList = true;

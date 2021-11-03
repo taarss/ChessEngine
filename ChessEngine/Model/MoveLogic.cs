@@ -39,7 +39,7 @@ namespace ChessEngine.Model
                 if (boardViewModel.TheGrid[startSquare].piece != null)
                 {                   
                     //Check if it matches color of whoevers turn it is
-                    if (boardViewModel.TheGrid[startSquare].piece.IsWhite == boardViewModel.IsWhitesTurn)
+                    if (boardViewModel.TheGrid[startSquare].piece.IsWhite == boardViewModel.BitBoard.WhiteToMove)
                     {
                         moves.AddRange(GenerateMovesBoilerPlate(boardViewModel.TheGrid[startSquare].piece, startSquare));
                     }
@@ -98,7 +98,8 @@ namespace ChessEngine.Model
         }
         public void PlacePiece(Move move)
         {
-            boardViewModel.bitBoard.MakeMove(new BitBoard.BitMove(move.StartSquare, move.TargetSquare));
+            boardViewModel.BitBoard.MakeMove(new BitBoard.BitMove(move.StartSquare, move.TargetSquare));
+            boardViewModel.BitBoard.SwitchTurn();
             boardViewModel.UpdateGUI();
 
         }
@@ -127,7 +128,7 @@ namespace ChessEngine.Model
         public static void SwitchTurn()
         {
             BoardViewModel temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
-            temp.IsWhitesTurn = !temp.IsWhitesTurn;
+            temp.BitBoard.SwitchTurn();
         }
 
 
@@ -149,7 +150,7 @@ namespace ChessEngine.Model
             List<Move> moves = new List<Move>();            
             if (piece != null)
             {                              
-                    if (piece.IsWhite == boardViewModel.IsWhitesTurn)
+                    if (piece.IsWhite == boardViewModel.BitBoard.WhiteToMove)
                     {
                         moves = GenerateMovesBoilerPlate(piece, startingPosition);
                     }
@@ -168,7 +169,7 @@ namespace ChessEngine.Model
             }
             if (piece.Name == "Pawn")
             {
-                Pawn pawnMoves = new(boardViewModel.IsWhitesTurn);
+                Pawn pawnMoves = new(boardViewModel.BitBoard.WhiteToMove);
                 moves = pawnMoves.GeneratePossibleMoves(piece, startingPosition);
             }
             if (piece.Name == "King")
