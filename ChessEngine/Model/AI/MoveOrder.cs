@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using ChessEngine.Model;
 using ChessEngine.Model.Piece;
 using ChessEngine.ViewModel;
+using ChessEngine.Model.BitBoard;
 
 namespace ChessEngine.Model.AI
 {
     public class MoveOrder
     {
-        private Evaluate evaluation = new();
+        private Evaluation evaluation = new();
         int[] moveScores;
         const int maxMoveCount = 218;
 
@@ -21,9 +22,53 @@ namespace ChessEngine.Model.AI
         }
 
 
-        
+        public List<BitMove> OrderMoves(List<BitMove> moves)
+        {
+            BoardViewModel board = (BoardViewModel)App.Current.Resources["boardViewModel"];
+            for (int i = 0; i < moves.Count; i++)
+            {
+                int score = 0;
+                int movePieceType = board.BitBoard.Square[i];
+                int capturePieceType = board.BitBoard.Square[i];
 
-        List<Move> Sort(List<Move> moves)
+                //Favor capturing opponents most valuable pieces with our least valuable pieces
+                if (capturePieceType != 0)
+                {
+                    score = 10 * GetPieceValue(capturePieceType) - GetPieceValue(movePieceType);
+                }
+
+                foreach (var attackedSquare in board.AttackMap)
+                {
+                    if (attackedSquare.TargetSquare == moves[i].TargetSquare)
+                    {
+                        score -= GetPieceValue(movePieceType);
+                        break;
+                    }
+                }
+                moveScores[i] = score;
+            }
+            return Sort(moves);
+
+        }
+        static int GetPieceValue(int pieceType)
+        {
+            switch (pieceType)
+            {
+                case BitPiece.Queen:
+                    return Evaluation.queenValue;
+                case BitPiece.Rook:
+                    return Evaluation.rookValue;
+                case BitPiece.Knight:
+                    return Evaluation.knightValue;
+                case BitPiece.Bishop:
+                    return Evaluation.bishopValue;
+                case BitPiece.Pawn:
+                    return Evaluation.pawnValue;
+                default:
+                    return 0;
+            }
+        }
+        List<BitMove> Sort(List<BitMove> moves)
         {
             // Sort the moves list based on scores
             for (int i = 0; i < moves.Count - 1; i++)

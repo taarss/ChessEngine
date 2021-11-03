@@ -90,14 +90,26 @@ namespace ChessEngine.View
             oldIndex = CalculateIndexFromPosition(position);
             selectedPiece = boardViewModel.TheGrid[oldIndex].piece;
             if (selectedPiece.IsWhite == boardViewModel.BitBoard.WhiteToMove)
-            {  
-                moves = Check.GenerateLegelMoves(oldIndex, selectedPiece);
+            {
+                BitMoveGeneration bitMoveGeneration = new();
+                bitMoves = bitMoveGeneration.GenerateMoves(boardViewModel.BitBoard);
+                moves = TranslateBitmoveToMove(bitMoves);
                 MarkLegalMoves(moves);
-                MarkAllAttackedSquares(boardViewModel.AttackMap);
+                //MarkAllAttackedSquares(boardViewModel.AttackMap);
                 isDragging = true;
                 followPiece.Visibility = Visibility.Visible;
             }
             
+        }
+
+        private List<Move> TranslateBitmoveToMove(List<BitMove> bitMoves)
+        {
+            List<Move> result = new();
+            foreach (var bitMove in bitMoves)
+            {
+                result.Add(new Move(bitMove.StartSquare, bitMove.TargetSquare));
+            }
+            return result;
         }
 
         private void PlacePiece(object sender, MouseButtonEventArgs e)
@@ -128,7 +140,7 @@ namespace ChessEngine.View
                 {
                     boardViewModel.TheGrid[oldIndex].piece = selectedPiece;
                 }
-                MarkAllAttackedSquares(boardViewModel.AttackMap);
+                //MarkAllAttackedSquares(boardViewModel.AttackMap);
             }
             isDragging = false;
             followPiece.Visibility = Visibility.Collapsed;

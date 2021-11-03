@@ -15,12 +15,13 @@ namespace ChessEngine.Model.BitBoard
 		int friendlyColourIndex;
 		int opponentColourIndex;
 		BitBoard board;
-		Dictionary<int, int> myPawns = new();
-		Dictionary<int, int> myKnights = new();
-		Dictionary<int, int> myBishops = new();
-		Dictionary<int, int> myRooks = new();
-		Dictionary<int, int> myQueens = new();
-		KeyValuePair<int, int> myKing;
+
+		List<int> myPawns = new();
+		List<int> myKnights = new();
+		List<int> myBishops = new();
+		List<int> myRooks = new();
+		List<int> myQueens = new();
+		int myKing;
 
 
 		// Generates list of legal moves in current position.
@@ -58,27 +59,27 @@ namespace ChessEngine.Model.BitBoard
 				{
 					if (board.Square[i] == King)
 					{
-						myKing = new KeyValuePair<int, int>(i, King);
+						myKing = i;
 					}
 					if (board.Square[i] == Pawn)
 					{
-						myPawns.Add(i, Pawn);
+						myPawns.Add(i);
 					}
 					if (board.Square[i] == Knight)
 					{
-						myKnights.Add(i, Knight);
+						myKnights.Add(i);
 					}
 					if (board.Square[i] == Bishop)
 					{
-						myBishops.Add(i, Bishop);
+						myBishops.Add(i);
 					}
 					if (board.Square[i] == Rook)
 					{
-						myRooks.Add(i, Rook);
+						myRooks.Add(i);
 					}
 					if (board.Square[i] == Queen)
 					{
-						myQueens.Add(i, Queen);
+						myQueens.Add(i);
 					}
 				}
 
@@ -93,9 +94,9 @@ namespace ChessEngine.Model.BitBoard
 
 		void GenerateKingMoves()
 		{
-			for (int i = 0; i < PrecomputedMoveData.kingMoves[myKing.Key].Length; i++)
+			for (int i = 0; i < PrecomputedMoveData.kingMoves[myKing].Length; i++)
 			{
-				int targetSquare = PrecomputedMoveData.kingMoves[myKing.Key][i];
+				int targetSquare = PrecomputedMoveData.kingMoves[myKing][i];
 				int pieceOnTargetSquare = board.Square[targetSquare];
 
 				// Skip squares occupied by friendly pieces
@@ -105,7 +106,7 @@ namespace ChessEngine.Model.BitBoard
 				}
 				// Safe for king to move to this square
 
-				moves.Add(new BitMove(myKing.Key, targetSquare));
+				moves.Add(new BitMove(myKing, targetSquare));
 
 
 			}
@@ -115,16 +116,16 @@ namespace ChessEngine.Model.BitBoard
 		{
 			for (int i = 0; i < myRooks.Count; i++)
 			{
-				GenerateSlidingPieceMoves(myRooks.ElementAt(i).Key , 0, 4);
+				GenerateSlidingPieceMoves(myRooks.ElementAt(i) , 0, 4);
 			}
 
 			for (int i = 0; i < myBishops.Count; i++)
 			{
-				GenerateSlidingPieceMoves(myBishops.ElementAt(i).Key, 4, 8);
+				GenerateSlidingPieceMoves(myBishops.ElementAt(i), 4, 8);
 			}
 			for (int i = 0; i < myQueens.Count; i++)
 			{
-				GenerateSlidingPieceMoves(myQueens.ElementAt(i).Key, 0, 8);
+				GenerateSlidingPieceMoves(myQueens.ElementAt(i), 0, 8);
 			}
 
 		}
@@ -147,7 +148,7 @@ namespace ChessEngine.Model.BitBoard
 						break;
 					}
 					bool isCapture = targetSquarePiece != BitPiece.None;
-
+					moves.Add(new BitMove(startSquare, targetSquare));
 
 
 					// If square not empty, can't move any further in this direction
@@ -164,15 +165,23 @@ namespace ChessEngine.Model.BitBoard
 		{
 			for (int i = 0; i < myKnights.Count; i++)
 			{
-				int startSquare = myKnights.ElementAt(i).Key;
+				int startSquare = myKnights.ElementAt(i);
 
 				for (int knightMoveIndex = 0; knightMoveIndex < PrecomputedMoveData.knightMoves[startSquare].Length; knightMoveIndex++)
 				{
 					int targetSquare = PrecomputedMoveData.knightMoves[startSquare][knightMoveIndex];
 					int targetSquarePiece = board.Square[targetSquare];
-					bool isCapture = BitPiece.IsColour(targetSquarePiece, opponentColour);
-
-					moves.Add(new BitMove(startSquare, targetSquare));
+                    if (targetSquarePiece != 0)
+                    {
+                        if (BitPiece.IsColour(targetSquarePiece, opponentColour))
+                        {
+							moves.Add(new BitMove(startSquare, targetSquare));
+						}
+					}
+                    else
+                    {
+						moves.Add(new BitMove(startSquare, targetSquare));
+					}
 
 				}
 			}
@@ -181,13 +190,13 @@ namespace ChessEngine.Model.BitBoard
 		void GeneratePawnMoves()
 		{
 			int pawnOffset = (friendlyColour == BitPiece.White) ? -8 : 8;
-			int startRank = (board.WhiteToMove) ? 1 : 6;
+			int startRank = (board.WhiteToMove) ? 6 : 1;
 
 
 
 			for (int i = 0; i < myPawns.Count; i++)
 			{
-				int startSquare = myPawns.ElementAt(i).Key;
+				int startSquare = myPawns.ElementAt(i);
 				int rank = BoardRepresentation.RankIndex(startSquare);
 
 

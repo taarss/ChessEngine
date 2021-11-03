@@ -130,20 +130,20 @@ namespace ChessEngine.ViewModel
             return result;
         }
 
-        public List<Piece> GetAllTypePieces(Piece piece)
+        public List<int> GetAllTypePieces(int piece)
         {
-            List<Piece> result = new();
+            List<int> result = new();
 
-            foreach (var item in theGrid)
+            for (int i = 0; i < bitBoard.Square.Length; i++)
             {
-                if (item.piece != null)
+                if (bitBoard.Square[i] != 0)
                 {
-                    if (item.piece.Name == piece.Name && item.piece.IsWhite == piece.IsWhite)
+                    if (bitBoard.Square[i] == piece)
                     {
-                        result.Add(item.piece);
+                        result.Add(bitBoard.Square[i]);
                     }
-                }               
-            }
+                }
+            }    
             return result;
         }
 

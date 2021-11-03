@@ -98,9 +98,10 @@ namespace ChessEngine.Model
         }
         public void PlacePiece(Move move)
         {
-            boardViewModel.BitBoard.MakeMove(new BitBoard.BitMove(move.StartSquare, move.TargetSquare));
-            boardViewModel.BitBoard.SwitchTurn();
-            boardViewModel.UpdateGUI();
+            temp = (BoardViewModel)App.Current.Resources["boardViewModel"];
+            temp.BitBoard.MakeMove(new BitBoard.BitMove(move.StartSquare, move.TargetSquare));
+            temp.BitBoard.SwitchTurn();
+            temp.UpdateGUI();
 
         }
 

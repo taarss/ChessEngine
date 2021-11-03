@@ -80,6 +80,9 @@ namespace ChessEngine.Model.BitBoard
 		public void SwitchTurn()
         {
 			WhiteToMove = !WhiteToMove; // false
+			OpponentColour = (whiteToMove) ? BitPiece.Black : BitPiece.White; // white = 8 black = 16
+
+
 			ColourToMove = (WhiteToMove) ? BitPiece.White : BitPiece.Black; // white = 8 black = 16
 			ColourToMoveIndex = 1 - ColourToMoveIndex; // 0 = white 1 = black
 		}
@@ -88,6 +91,7 @@ namespace ChessEngine.Model.BitBoard
         {
 			WhiteToMove = turn;
 			ColourToMove = (turn) ? BitPiece.White : BitPiece.Black; // white = 8 black = 16
+			OpponentColour = (turn) ? BitPiece.Black : BitPiece.White; // white = 8 black = 16
 			ColourToMoveIndex = (turn) ? 0 : 1;
 		}
 
@@ -106,6 +110,7 @@ namespace ChessEngine.Model.BitBoard
 
 			// Side to move
 			WhiteToMove = loadedPosition.whiteToMove;
+			OpponentColour = (WhiteToMove) ? BitPiece.Black : BitPiece.White;
 			ColourToMove = (WhiteToMove) ? BitPiece.White : BitPiece.Black;
 			ColourToMoveIndex = (WhiteToMove) ? 0 : 1;
 
