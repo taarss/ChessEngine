@@ -1,42 +1,58 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ChessEngine.Model;
+using ChessEngine;
+using ChessEngine.Model.BitBoard;
 using ChessEngine.ViewModel;
 
-namespace ChessEngine.Model.AI
+namespace ChessEngine
 {
-    public class Evaluate
-    {
-        const int pawnValue = 100;
-        const int knightValue = 300;
-        const int bishopValue = 300;
-        const int rookValue = 500;
-        const int queenValue = 900;
+	public class Evaluation
+	{
 
-        public int EvaluateMaterial()
-        {
-            BoardViewModel board = (BoardViewModel)App.Current.Resources["boardViewModel"];
-            int whiteEval = CountMaterial(true);
-            int blackEval = CountMaterial(false);
+		public const int pawnValue = 100;
+		public const int knightValue = 300;
+		public const int bishopValue = 320;
+		public const int rookValue = 500;
+		public const int queenValue = 900;
 
-            int evaluation = whiteEval - blackEval;
-            int perspective = board.IsWhitesTurn ? 1 : -1;
-            return evaluation * perspective;
-        }
+		BitBoard board;
 
-        private int CountMaterial(bool isWhite)
-        {
-            BoardViewModel board = (BoardViewModel)App.Current.Resources["boardViewModel"];
-            int material = 0;
-            material += board.GetAllTypePieces(new Piece.Piece("Pawn", isWhite)).Count * pawnValue;
-            material += board.GetAllTypePieces(new Piece.Piece("Knight", isWhite)).Count * knightValue;
-            material += board.GetAllTypePieces(new Piece.Piece("Bishop", isWhite)).Count * bishopValue;
-            material += board.GetAllTypePieces(new Piece.Piece("Rook", isWhite)).Count * rookValue;
-            material += board.GetAllTypePieces(new Piece.Piece("Queen", isWhite)).Count * queenValue;
-            return material;
-        }
-    }
+		// Performs static evaluation of the current position.
+		// The position is assumed to be 'quiet', i.e no captures are available that could drastically affect the evaluation.
+		// The score that's returned is given from the perspective of whoever's turn it is to move.
+		// So a positive score means the player who's turn it is to move has an advantage, while a negative score indicates a disadvantage.
+		public int Evaluate(BitBoard board)
+		{
+			this.board = board;
+			int whiteEval = 0;
+			int blackEval = 0;
+
+			int whiteMaterial = CountMaterial(8);
+			int blackMaterial = CountMaterial(16);
+			whiteEval += whiteMaterial;
+			blackEval += blackMaterial;
+
+
+			int eval = whiteEval - blackEval;
+
+			int perspective = (board.WhiteToMove) ? 1 : -1;
+			return eval * perspective;
+		}
+
+		
+
+
+		int CountMaterial(int colour)
+		{
+			BoardViewModel board = (BoardViewModel)App.Current.Resources["boardViewModel"];
+			int material = 0;
+			material += board.GetAllTypePieces(2 + colour).Count * pawnValue;
+			material += board.GetAllTypePieces(3 + colour).Count * knightValue;
+			material += board.GetAllTypePieces(4 + colour).Count * bishopValue;
+			material += board.GetAllTypePieces(5 + colour).Count * rookValue;
+			material += board.GetAllTypePieces(6 + colour).Count * queenValue;
+
+			return material;
+		}		
+	}
 }

@@ -35,7 +35,7 @@ namespace ChessEngine.Model
         }
 
         public Cell[] Array { get => array; set {
-                this.Array = value;
+                this.array = value;
                 RaisePropertyChanged("TheGrid.Array");
             }
         }

@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ChessEngine.Model.AI;
+using ChessEngine.Model.BitBoard;
 
 namespace ChessEngine.View
 {
@@ -33,6 +34,13 @@ namespace ChessEngine.View
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            if (boardViewModel.oldMoves.Count != 0)
+            {
+                boardViewModel.BitBoard.UnmakeMove(boardViewModel.oldMoves.Pop());
+                boardViewModel.UpdateGUI();
+            }
+
+            /*
             Stopwatch stopwatch = new();
             for (int i = 0; i < 1; i++)
             {
@@ -62,16 +70,17 @@ namespace ChessEngine.View
                 canvas.Children.Add(text);
                 canvas.Height = 50;
                 testResults.Children.Add(canvas);
-            }
+            }*/
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             testResults.Children.Clear();
-
-            int result = boardViewModel.Ai.SearchMoves(2, Int32.MinValue, Int32.MaxValue);
-            boardViewModel.MoveLogic.MakeMove(boardViewModel.Ai.BestMove);
-            boardViewModel.MoveLogic.SwitchTurn();
+            BitBoard tempBoard = boardViewModel.BitBoard;
+            AI ai = new();
+            ai.StartSearch();
+            boardViewModel.BitBoard.MakeMove(ai.GetSearchResult());
+            boardViewModel.UpdateGUI();
         }
     }
 }

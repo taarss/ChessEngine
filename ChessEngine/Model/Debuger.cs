@@ -81,18 +81,18 @@ namespace ChessEngine.Model
                 boardViewModel.MoveLogic.MakePseudoMove(move);
                 numPositionsBinding++;
                 await Task.Delay(10);
-                boardViewModel.MoveLogic.SwitchTurn();
+                MoveLogic.SwitchTurn();
                 moves = boardViewModel.MoveLogic.GenerateMoves();
                 foreach (var item in moves)
                 {
                     boardViewModel.MoveLogic.MakePseudoMove(item);
                     numPositionsBinding++;
                     await Task.Delay(10);
-                    boardViewModel.MoveLogic.UnmakeMove(item);
+                    boardViewModel.MoveLogic.UnmakeMove();
                     await Task.Delay(10);
                 }
-                boardViewModel.MoveLogic.UnmakeMove(move);
-                boardViewModel.MoveLogic.SwitchTurn();
+                boardViewModel.MoveLogic.UnmakeMove();
+                MoveLogic.SwitchTurn();
                 await Task.Delay(10);
 
 

@@ -11,6 +11,9 @@
         <Canvas>
             <Rectangle x:Name="background" Height="480" Width="920"></Rectangle>
             <TextBlock FontWeight="DemiBold"  FontSize="30" Foreground="White" Canvas.Left="81">Moves</TextBlock>
+            <TextBlock FontWeight="DemiBold"  FontSize="30" Foreground="White" Canvas.Left="281">Current turn</TextBlock>
+            <TextBlock FontWeight="DemiBold"  FontSize="30" Foreground="White" Canvas.Left="281" Canvas.Top="43" Text="{Binding BitBoard.WhiteToMove, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Width="177"></TextBlock>
+
             <Border  BorderBrush="White" BorderThickness="3"  Canvas.Left="38" Canvas.Top="38">
                 <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Visible">
                     <StackPanel Background="LightGray" Orientation="Horizontal" Height="400" Width="177">
@@ -28,8 +31,8 @@
             <StackPanel x:Name="testResults" Orientation="Vertical" Height="267" Width="453" Canvas.Left="269" Canvas.Top="42">
 
             </StackPanel>
-            <Button Canvas.Left="461" Canvas.Top="399" Click="Button_Click" Width="175" Height="38">Run Test</Button>
-            <Button Canvas.Left="271" Canvas.Top="399"  Width="175" Height="38" Click="Button_Click_1">Clear Results</Button>
+            <Button Canvas.Left="461" Canvas.Top="399" Click="Button_Click" Width="175" Height="38">Unmake move</Button>
+            <Button Canvas.Left="271" Canvas.Top="399"  Width="175" Height="38" Click="Button_Click_1">Run AI</Button>
             <TextBlock Text="{Binding Debuger.NumPositionsBinding, UpdateSourceTrigger=PropertyChanged, IsAsync=True, Mode=OneWay}" FontWeight="DemiBold"  FontSize="30" Foreground="White" Canvas.Left="284" Canvas.Top="326" Width="103"></TextBlock>
         </Canvas>
     </Grid>
